@@ -1,5 +1,11 @@
 # @yavuzmercan/ui
 
+## 0.2.2
+
+### Patch Changes
+
+- 75763b0: versiyon değişiklik testi
+
 ## 0.2.1
 
 ### Patch Changes
