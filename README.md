@@ -1,138 +1,139 @@
 # Mercan React Framework
 
-A themeable, internationalized, extensible React UI component framework for the web.
+[![npm](https://img.shields.io/npm/v/@yavuzmercan/ui.svg?style=flat-square)](https://www.npmjs.com/package/@yavuzmercan/ui)
+[![CI](https://github.com/yavuzmercan/mercan-react-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/yavuzmercan/mercan-react-framework/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/@yavuzmercan/ui.svg?style=flat-square)](./LICENSE)
+
+Theme-aware, i18n-ready React UI framework for the web — published as a single package: **[`@yavuzmercan/ui`](https://www.npmjs.com/package/@yavuzmercan/ui)**.
+
+> 70+ components · 88 icons · 55 hooks · theme/i18n/Google Fonts in one install.
+
+This repository is the monorepo that develops the package, hosts the showcase apps, and runs CI/release. **If you just want to use the framework**, install from npm:
+
+```bash
+npm install @yavuzmercan/ui
+```
+
+…and read the package [README](./packages/ui/README.md) or [npm page](https://www.npmjs.com/package/@yavuzmercan/ui).
+
+The rest of this document is for **contributors and maintainers**.
+
+---
 
 ## Workspace layout
 
 ```
-mercanReactFramework/
+mercan-react-framework/
 ├── packages/
-│   ├── core/         # ThemeProvider, I18nProvider, hooks, tokens
-│   └── components/   # 35+ UI components + global styles.css
-└── apps/
-    └── sample-web/   # Vite showcase consuming the framework
+│   └── ui/              # @yavuzmercan/ui — the published package
+│       ├── src/
+│       │   ├── core/    # theme, i18n, hooks, utils
+│       │   ├── icons/   # 88 SVG icons + createIcon helper
+│       │   ├── components/  # 70+ UI components
+│       │   ├── styles.css   # single bundled stylesheet
+│       │   └── index.ts     # barrel re-export
+│       ├── tsup.config.ts
+│       └── vitest.config.ts
+├── apps/
+│   ├── sample-web/      # Vite showcase consuming the workspace package
+│   └── docs/            # Storybook-like documentation app
+├── .changeset/          # pending Changesets entries
+├── .github/
+│   ├── workflows/
+│   │   ├── ci.yml       # PR/push: typecheck + test + build
+│   │   └── release.yml  # main: open Version PR or publish to npm
+│   ├── ISSUE_TEMPLATE/
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   └── dependabot.yml
+└── tsconfig.base.json
 ```
 
 ## Getting started
 
 ```bash
+git clone https://github.com/yavuzmercan/mercan-react-framework.git
+cd mercan-react-framework
 npm install
-npm run dev
+npm run dev          # Sample app:  http://localhost:5173
+npm run docs         # Docs app:    http://localhost:5174
 ```
 
-This starts the sample app at http://localhost:5173 — it imports `@yavuzmercan/components` and `@yavuzmercan/core` directly from the workspace.
+`npm install` runs the package's `prepare` script, which builds `packages/ui/dist/`. The apps consume the built output via the workspace symlink, so the workspace works the same way an end-user install would.
 
-## Using the framework in a project
+If you change library code, run a watch build in another terminal so the apps see updates:
 
-```tsx
-import '@yavuzmercan/components/styles.css';
-import { MercanProvider, Button, Card, CardBody, useToast } from '@yavuzmercan/components';
-import { useTranslation, useColorMode } from '@yavuzmercan/core';
-
-const resources = {
-  en: { greet: 'Hello, {name}!' },
-  tr: { greet: 'Merhaba, {name}!' },
-};
-
-export const App = () => (
-  <MercanProvider
-    defaultColorMode="light"
-    locale="en"
-    fallbackLocale="en"
-    resources={resources}
-    lightOverride={{ colors: { primary: '#ff5a5f' } }}
-  >
-    <Demo />
-  </MercanProvider>
-);
-
-const Demo = () => {
-  const { t } = useTranslation();
-  const { toggleColorMode } = useColorMode();
-  const toast = useToast();
-  return (
-    <Card shadow>
-      <CardBody>
-        <p>{t('greet', { name: 'Ada' })}</p>
-        <Button onClick={toggleColorMode}>Toggle theme</Button>
-        <Button onClick={() => toast.show({ title: 'Saved', status: 'success' })}>
-          Toast
-        </Button>
-      </CardBody>
-    </Card>
-  );
-};
+```bash
+npm run dev --workspace packages/ui   # tsup --watch
 ```
-
-## Theming
-
-Theme tokens are exposed as CSS custom properties (`--mf-color-primary`, `--mf-spacing-lg`, …). The `ThemeProvider` writes them to `document.documentElement`, so you can override them globally.
-
-Override at the provider:
-
-```tsx
-<MercanProvider
-  lightOverride={{
-    colors: { primary: '#ff5a5f', primaryHover: '#e74c52' },
-    radii: { md: '12px' },
-  }}
-  darkOverride={{ colors: { background: '#000' } }}
-  ...
-/>
-```
-
-Or override directly with CSS:
-
-```css
-:root {
-  --mf-color-primary: #ff5a5f;
-  --mf-radius-md: 12px;
-}
-```
-
-## i18n
-
-`I18nProvider` is bundled inside `MercanProvider`. Use `useTranslation()`:
-
-```tsx
-const { t, locale, setLocale, formatNumber, formatDate } = useTranslation();
-t('items', { count: 3 }); // pluralization: "1 item|{count} items"
-```
-
-## Component list
-
-### Layout
-`Box` · `Stack` · `HStack` · `VStack` · `Grid` · `Divider` · `Spacer` · `Container`
-
-### Typography
-`Text` · `Heading` · `Label`
-
-### Forms
-`Button` · `IconButton` · `Input` · `TextArea` · `Checkbox` · `Radio` / `RadioGroup` · `Switch` · `Select` · `Slider` · `FormField` · `FormGroup`
-
-### Data display
-`Avatar` · `Badge` · `Tag` · `Card` (`CardHeader`, `CardBody`, `CardFooter`) · `Image` · `Icon` · `Progress` · `Spinner` · `Skeleton` · `List` / `ListItem`
-
-### Feedback
-`Alert` · `Toast` (`ToastProvider`, `useToast`) · `Modal` · `Tooltip` · `Popover`
-
-### Navigation
-`Tabs` (`TabList`, `Tab`, `TabPanel`) · `Breadcrumb` · `Pagination` · `Menu` (`MenuItem`, `MenuDivider`) · `Drawer` · `Accordion` (`AccordionItem`)
-
-### Hooks
-`useTheme` · `useColorMode` · `useTranslation` · `useToast` · `useDisclosure` · `useClickOutside` · `useMediaQuery` · `useEscape`
-
-## Extending
-
-- All components accept `className` and `style` for ad-hoc tweaks.
-- Polymorphism: `Box` and `Text` accept an `as` prop.
-- Variants: `Button` (`solid` / `outline` / `ghost` / `link`), `colorScheme`, `size`.
-- Compose your own primitives on top of `Box` + `useTheme` + the `v.color()` / `v.space()` helpers from `@yavuzmercan/core`.
 
 ## Scripts
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Start the sample app |
-| `npm run build` | Build all workspaces |
-| `npm run typecheck` | TypeScript project references build |
+| `npm run dev` | Start the sample-web Vite app |
+| `npm run docs` | Start the docs Vite app |
+| `npm run build:packages` | Build `@yavuzmercan/ui` (ESM + CJS + d.ts + CSS) |
+| `npm run build` | Build everything (packages + apps) |
+| `npm test` | Run vitest test suite (47 tests) |
+| `npm run typecheck` | TypeScript project-references build |
+| `npm run changeset` | Create a new changeset entry |
+| `npm run version` | Apply pending changesets — bumps version, updates CHANGELOG |
+| `npm run release` | Build + `changeset publish` (manual local publish) |
+
+## Tech stack
+
+- **Build:** [tsup](https://tsup.egoist.dev/) (ESM + CJS + .d.ts)
+- **Test:** [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/) + jsdom
+- **Apps:** [Vite](https://vitejs.dev/) + React 18
+- **Versioning:** [Changesets](https://github.com/changesets/changesets)
+- **CI:** GitHub Actions (test + auto-release)
+- **Bot updates:** Dependabot (weekly, grouped)
+
+## Contributing
+
+1. Fork + clone
+2. `git checkout -b feature/your-thing`
+3. Code your change
+4. `npm test && npm run typecheck`
+5. **Create a changeset:** `npm run changeset`
+   - Pick `@yavuzmercan/ui`
+   - Bump type: `patch` (fix), `minor` (new feature), `major` (breaking)
+   - Write a short user-facing description
+6. Commit `.changeset/*.md` + your code
+7. Open a PR
+
+The PR template guides you through the rest. Every PR runs CI (typecheck + tests + build).
+
+## Releasing
+
+Two flows are supported:
+
+### CI-driven (preferred)
+- Push to `main` with a `.changeset/*.md` file
+- CI bot opens a "Version Packages" PR — review, merge
+- CI bot then publishes to npm and creates a GitHub Release
+
+### Manual
+- `npm run changeset` → `npm run version` → `npm run release`
+
+Full details: [RELEASING.md](./RELEASING.md).
+
+For CI publishing to work, two GitHub secrets/settings are needed once:
+- **`NPM_TOKEN`** secret in repo settings (npm Automation token)
+- Repo Settings → Actions → General → **Workflow permissions: Read and write** + **Allow GitHub Actions to create and approve pull requests**
+
+## Project status
+
+Pre-1.0 (`0.x`). Minor bumps may include breaking changes.
+
+## License
+
+MIT © Yavuz Mercan
+
+## Links
+
+- 📦 [npm package](https://www.npmjs.com/package/@yavuzmercan/ui)
+- 📖 [Package README](./packages/ui/README.md)
+- 📋 [CHANGELOG](./packages/ui/CHANGELOG.md)
+- 🚀 [Release process](./RELEASING.md)
+- 🐛 [Issues](https://github.com/yavuzmercan/mercan-react-framework/issues)
