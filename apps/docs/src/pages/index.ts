@@ -5,6 +5,7 @@ import { ThemingPage } from './Theming';
 import { I18nPage } from './I18n';
 import { IconsPage } from './Icons';
 import { FontsPage } from './Fonts';
+import { HooksPage } from './Hooks';
 import { BoxPage, StackPage, GridPage, DividerPage, ContainerPage } from './Layout';
 import { TextPage, HeadingPage } from './Typography';
 import {
@@ -39,6 +40,7 @@ export const PAGES: Record<string, ComponentType> = {
   '/i18n': I18nPage,
   '/icons': IconsPage,
   '/fonts': FontsPage,
+  '/hooks': HooksPage,
 
   '/box': BoxPage,
   '/stack': StackPage,

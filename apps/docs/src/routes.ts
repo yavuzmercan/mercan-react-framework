@@ -18,6 +18,7 @@ export const ROUTES: RouteSection[] = [
       { path: '/i18n', label: 'i18n' },
       { path: '/icons', label: 'Icons' },
       { path: '/fonts', label: 'Fonts' },
+      { path: '/hooks', label: 'Hooks' },
     ],
   },
   {
