@@ -17,7 +17,7 @@ jobs:
     permissions:
       contents: write       # CHANGELOG/version commit'i + tag push
       pull-requests: write  # "Version Packages" PR'ını açma/güncelleme
-      id-token: write       # npm provenance için (opsiyonel ama önerilir)
+      # id-token: write     # npm provenance için — temel publish çalışınca aç
 
     steps:
       - name: Checkout
@@ -50,4 +50,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+          # NPM_CONFIG_PROVENANCE: true   # temel publish çalışınca aç
