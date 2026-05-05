@@ -1,0 +1,36 @@
+import { baseTokens } from './tokens';
+import type { Theme } from './types';
+
+export const lightTheme: Theme = {
+  name: 'light',
+  colorMode: 'light',
+  ...baseTokens,
+  colors: {
+    background: '#ffffff',
+    surface: '#ffffff',
+    surfaceAlt: '#f6f7f9',
+    border: '#e3e6eb',
+    borderSubtle: '#eef0f3',
+    text: '#0f1115',
+    textMuted: '#5f6672',
+    textInverse: '#ffffff',
+    primary: '#3b6cff',
+    primaryHover: '#2f5ce6',
+    primaryActive: '#264cc2',
+    primaryContrast: '#ffffff',
+    secondary: '#6b7280',
+    secondaryHover: '#4b5563',
+    secondaryContrast: '#ffffff',
+    success: '#16a34a',
+    successContrast: '#ffffff',
+    warning: '#d97706',
+    warningContrast: '#ffffff',
+    danger: '#dc2626',
+    dangerHover: '#b91c1c',
+    dangerContrast: '#ffffff',
+    info: '#0284c7',
+    infoContrast: '#ffffff',
+    overlay: 'rgba(15, 17, 21, 0.5)',
+    focusRing: 'rgba(59, 108, 255, 0.45)',
+  },
+};

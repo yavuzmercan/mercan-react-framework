@@ -1,0 +1,43 @@
+import { baseTokens } from './tokens';
+import type { Theme } from './types';
+
+export const darkTheme: Theme = {
+  name: 'dark',
+  colorMode: 'dark',
+  ...baseTokens,
+  colors: {
+    background: '#0b0d12',
+    surface: '#13161d',
+    surfaceAlt: '#1a1e27',
+    border: '#262b35',
+    borderSubtle: '#1e222b',
+    text: '#f3f5f8',
+    textMuted: '#9ba3b1',
+    textInverse: '#0b0d12',
+    primary: '#6c8eff',
+    primaryHover: '#83a1ff',
+    primaryActive: '#a0b6ff',
+    primaryContrast: '#0b0d12',
+    secondary: '#9ca3af',
+    secondaryHover: '#cbd0d9',
+    secondaryContrast: '#0b0d12',
+    success: '#22c55e',
+    successContrast: '#0b0d12',
+    warning: '#f59e0b',
+    warningContrast: '#0b0d12',
+    danger: '#ef4444',
+    dangerHover: '#f87171',
+    dangerContrast: '#0b0d12',
+    info: '#38bdf8',
+    infoContrast: '#0b0d12',
+    overlay: 'rgba(0, 0, 0, 0.6)',
+    focusRing: 'rgba(108, 142, 255, 0.55)',
+  },
+  shadows: {
+    none: 'none',
+    sm: '0 1px 2px rgba(0,0,0,0.4)',
+    md: '0 4px 8px rgba(0,0,0,0.45)',
+    lg: '0 10px 20px rgba(0,0,0,0.55)',
+    xl: '0 20px 30px rgba(0,0,0,0.6)',
+  },
+};
