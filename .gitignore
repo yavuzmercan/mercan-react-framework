@@ -10,4 +10,3 @@ build
 .env.local
 .tsbuildinfo
 .claude
-.changeset
