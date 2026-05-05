@@ -4,22 +4,17 @@
 
 ### Minor Changes
 
-- b832118: yeni özellik
-- b832118: Add comprehensive hook library (55 hooks across state, storage, lifecycle, async, DOM, browser APIs)
-- b832118: versiyon update
+- [`b832118`](https://github.com/yavuzmercan/mercan-react-framework/commit/b832118cbe330a430ffda418e0ec7a68cb46dbd0) Thanks [@yavuzm](https://github.com/yavuzm)! - yeni özellik
+
+- [`b832118`](https://github.com/yavuzmercan/mercan-react-framework/commit/b832118cbe330a430ffda418e0ec7a68cb46dbd0) Thanks [@yavuzm](https://github.com/yavuzm)! - Add comprehensive hook library (55 hooks across state, storage, lifecycle, async, DOM, browser APIs)
+
+- [`b832118`](https://github.com/yavuzmercan/mercan-react-framework/commit/b832118cbe330a430ffda418e0ec7a68cb46dbd0) Thanks [@yavuzm](https://github.com/yavuzm)! - versiyon update
 
 ### Patch Changes
 
-- Fix: published package now correctly resolves to `./dist/*` files.
+- [`aa8353d`](https://github.com/yavuzmercan/mercan-react-framework/commit/aa8353d7bd1f812b4c5d22ef79475574c48fb135) Thanks [@yavuzm](https://github.com/yavuzm)! - versiyon değişikliği
 
-  `0.1.0` shipped with `main`/`exports` pointing at source TS paths (`./src/index.ts`) because npm does not apply `publishConfig.main`/`exports` overrides at publish time. Consumers got "Failed to resolve import '@yavuzmercan/ui'" when installing.
-
-  Fix moves `main`, `module`, `types`, and `exports` to top-level pointing at the built `./dist/*` outputs, and reduces `publishConfig` to just `access: public`. A `prepare` script now builds the package on `npm install` so workspace consumers and post-clone setups always have a populated `dist/` directory.
-
-  Also pins build/test toolchain versions (TypeScript 5.5.4, Vite 5.4.1, Vitest 2.1.1, jsdom 25, `@vitejs/plugin-react` 4.3.1) to known-working real versions, fixes GitHub Action versions to `@v4`, and adds `vite-env.d.ts` to apps so CSS side-effect imports type-check on TypeScript 5.6+.
-
-- aa8353d: versiyon değişikliği
-- f3dabbb: Republish with built dist files and corrected dependencies
+- [`f3dabbb`](https://github.com/yavuzmercan/mercan-react-framework/commit/f3dabbbdce3f1f1b97c47907401c5cb9dddde775) Thanks [@yavuzm](https://github.com/yavuzm)! - Republish with built dist files and corrected dependencies
 
 ## 0.1.0
 
