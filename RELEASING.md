@@ -1,80 +1,91 @@
 # Releasing
 
-Mercan UI uses [Changesets](https://github.com/changesets/changesets) for version management and CHANGELOG generation.
+Mercan UI [Changesets](https://github.com/changesets/changesets) + GitHub Actions ile yarı-otomatik release yapar. Aşağıda **CI-driven** akış (önerilen) ve **manuel** akış var.
 
-## When you make a change
+---
 
-After landing a code change that should ship:
+## CI-driven (önerilen)
+
+### 1. Geliştirme sırasında
+
+Bir PR ile değişiklik gönderiyorsan:
 
 ```powershell
 npm run changeset
 ```
 
-This opens an interactive prompt:
-
-1. **Hangi paketi etkiliyor?** → `@yavuzmercan/ui` (shift+space to select)
-2. **Hangi tip bump?**
+İnteraktif soru-cevap:
+1. Hangi paket etkileniyor → `@yavuzmercan/ui`
+2. Bump tipi:
    - `major` — breaking changes (API kaldırma, davranış değişikliği)
    - `minor` — yeni özellikler (yeni komponent, yeni prop)
    - `patch` — bug fix, dokümantasyon, internal refactor
-3. **Açıklama:** kısa, kullanıcı bakış açısıyla — CHANGELOG'a düşecek
+3. Açıklama — kullanıcı bakış açısıyla, CHANGELOG'a düşecek
 
-`.changeset/<random-name>.md` adında bir dosya oluşur. Bu dosyayı **git'e commit et** ve PR'ına dahil et.
+`.changeset/<random>.md` üretilir. Bu dosyayı **PR'ına commit et**. CI buna bakacak.
 
-## Yayın sırası geldiğinde
+### 2. PR merge → otomatik "Version Packages" PR
 
-Birikmiş changeset'leri tek seferde uygulamak için:
+Main'e merge olduğu anda `release.yml` workflow'u çalışır. Eğer birikmiş changeset varsa **bot otomatik bir "Version Packages" PR'ı açar** (veya günceller). Bu PR:
+
+- `packages/ui/package.json`'da `version` alanını bump'lar
+- `packages/ui/CHANGELOG.md`'ye notları ekler (GitHub linkleri ile)
+- `.changeset/*.md` dosyalarını siler
+
+PR'ı incele, beğendiysen merge et.
+
+### 3. "Version Packages" PR merge → otomatik npm publish
+
+Bot main'e bu PR'ı merge ettiğinde, `release.yml` bu sefer changeset bulamaz ve `publish` adımına geçer:
+
+- `npm run build:packages` çalışır (test + build)
+- `changeset publish` npm'e push eder
+- GitHub'da release notu otomatik oluşur
+
+İşin biter — sürüm npm'de.
+
+### 4. Gerekli secret
+
+CI'nın npm'e push yapabilmesi için bir kez:
+
+1. https://www.npmjs.com/settings/yavuzmercan/tokens → **"Generate New Token"** → **"Automation"** tipi → kopyala
+2. https://github.com/yavuzmercan/mercan-react-framework/settings/secrets/actions → **"New repository secret"** → ad: `NPM_TOKEN`, değer: yapıştır
+
+İkinci kez yapmana gerek yok, token expiry'a kadar çalışır.
+
+---
+
+## Manuel (acil/küçük durumlar için)
+
+Tek bir hızlı fix için:
 
 ```powershell
-npm run version
-```
-
-Bu komut:
-- `packages/ui/package.json`'da `version` alanını uygun şekilde bump'lar
-- `packages/ui/CHANGELOG.md`'ye yeni bölüm ekler (changeset dosyalarındaki açıklamaları toplayıp)
-- `.changeset/*.md` dosyalarını siler (kullanıldı, bitti)
-
-Sonra commit + push:
-```powershell
-git add .
-git commit -m "chore: version packages"
+npm run changeset                  # changeset oluştur
+git add .changeset && git commit -m "<açıklama>"
 git push
+
+npm run version                    # versiyon bump + CHANGELOG
+git add . && git commit -m "chore: version packages"
+git push
+
+npm login                          # bir kez
+npm run release                    # build + npm publish
 ```
 
-## npm'e yayınla
-
-```powershell
-npm login              # bir kez
-npm run release        # build + changeset publish
-```
-
-`changeset publish` zaten yayınlanmış sürümleri atlar; bumped olanları npm'e gönderir. `prepublishOnly` script'i sayesinde otomatik test + build çalışır.
-
-2FA açıksa OTP istenir.
+---
 
 ## Workflow özeti
 
 ```
-Code change → npm run changeset → commit changeset.md → PR → merge
-                                                              ↓
-                              npm run version → commit → npm run release
+Code change → npm run changeset → commit & PR → merge to main
+                                                       ↓
+                                        release.yml → "Version Packages" PR açar
+                                                       ↓
+                                        İncele + merge → release.yml → npm publish
 ```
-
-## Bypass etmek istediğinde
-
-Tek bir küçük fix için changeset ekleme zahmeti istemezsen elle de yayınlayabilirsin:
-
-```powershell
-cd packages\ui
-npm version patch     # 0.1.0 → 0.1.1
-cd ..\..
-npm run release
-```
-
-Ama uzun vadede Changesets workflow'una sadık kalırsan CHANGELOG'un düzenli olur.
 
 ## Sürüm semantiği
 
-- `0.x.y` — pre-1.0 dönemi: minor bump'lar breaking olabilir
-- `1.0.0` — public API stabilize, semver kuralları aynen uygulanır
-- Pre-release tag'leri için: `npm run version -- --snapshot beta` → `0.2.0-beta-20260101`
+- `0.x.y` — pre-1.0: minor bump'lar breaking olabilir
+- `1.0.0` — public API stabil, semver kuralları aynen
+- Pre-release: `npm run version -- --snapshot beta` → `0.2.0-beta-20260101`

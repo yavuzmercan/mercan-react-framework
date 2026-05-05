@@ -1,0 +1,37 @@
+version: 2
+updates:
+  # npm bağımlılıkları — haftalık kontrol, gruplandırılmış PR'lar
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Europe/Istanbul
+    open-pull-requests-limit: 5
+    groups:
+      types:
+        patterns: ["@types/*"]
+      dev-tooling:
+        patterns:
+          - tsup
+          - vitest
+          - typescript
+          - "@vitejs/plugin-react"
+          - vite
+          - jsdom
+      testing:
+        patterns: ["@testing-library/*"]
+      changesets:
+        patterns: ["@changesets/*"]
+    ignore:
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+
+  # GitHub Actions versiyonlarını güncel tut
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

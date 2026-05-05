@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+# Aynı anda yalnızca tek release koşumu çalışsın
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Version or publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write       # CHANGELOG/version commit'i + tag push
+      pull-requests: write  # "Version Packages" PR'ını açma/güncelleme
+      id-token: write       # npm provenance için (opsiyonel ama önerilir)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # tag history için gerekli
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build:packages
+
+      - name: Create Release PR or publish
+        uses: changesets/action@v1
+        with:
+          # Birikmiş .changeset/*.md varsa "Version Packages" PR'ı açar/günceller.
+          # PR merge edilince (changeset'ler temizlenmiş olur) bu adım yerine publish koşar.
+          version: npx changeset version
+          publish: npx changeset publish
+          commit: "chore: version packages"
+          title: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
