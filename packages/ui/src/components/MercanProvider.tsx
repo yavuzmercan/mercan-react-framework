@@ -40,6 +40,10 @@ export interface MercanProviderProps {
   darkOverride?: ThemeOverride;
   /** Auto-loads Google Fonts and wires them into theme.fonts. */
   googleFonts?: GoogleFontsConfig;
+  /** Persist the chosen color mode to localStorage and rehydrate on next visit. Default `true`. */
+  persistColorMode?: boolean;
+  /** localStorage key for persisted color mode. Default `'mf-color-mode'`. */
+  colorModeStorageKey?: string;
   locale: Locale;
   resources: I18nResources;
   fallbackLocale?: Locale;
@@ -106,6 +110,8 @@ export const MercanProvider = ({
   lightOverride,
   darkOverride,
   googleFonts,
+  persistColorMode = true,
+  colorModeStorageKey,
   locale,
   resources,
   fallbackLocale,
@@ -134,7 +140,13 @@ export const MercanProvider = ({
   );
 
   return (
-    <ThemeProvider defaultColorMode={defaultColorMode} light={mergedLight} dark={mergedDark}>
+    <ThemeProvider
+      defaultColorMode={defaultColorMode}
+      light={mergedLight}
+      dark={mergedDark}
+      persistColorMode={persistColorMode}
+      colorModeStorageKey={colorModeStorageKey}
+    >
       <I18nProvider resources={resources} defaultLocale={locale} fallbackLocale={fallbackLocale}>
         <ToastProvider position={toastPosition}>
           <div className="mf-root">{children}</div>

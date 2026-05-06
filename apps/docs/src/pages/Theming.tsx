@@ -76,6 +76,27 @@ export const ThemingPage = () => (
       <Text tone="muted" size="sm">Both hooks are typed and re-render on theme changes.</Text>
     </Story>
 
+    <Heading level={3}>Persistence — color mode survives reload</Heading>
+    <Text>
+      The chosen color mode is saved to <code>localStorage</code> by default. When the user
+      reloads the page, the same theme returns instead of flickering back to the default.
+      Storage syncs across browser tabs too.
+    </Text>
+    <Story title="Default behavior — automatic persistence" code={`<MercanProvider defaultColorMode="light" ... />\n// First visit:        light\n// User toggles dark, reloads.\n// Second visit:       dark   ← persisted`}>
+      <Text size="sm" tone="muted">
+        Toggle the theme in the customizer above, refresh the page, and watch this docs site
+        keep your preference. Storage key: <code>mf-color-mode</code>.
+      </Text>
+    </Story>
+    <Story title="Custom storage key" code={`<MercanProvider colorModeStorageKey="my-app-theme" ... />`}>
+      <Text size="sm" tone="muted">Use this when you have multiple apps on the same origin.</Text>
+    </Story>
+    <Story title="Opt-out — persistColorMode={false}" code={`<MercanProvider persistColorMode={false} ... />`}>
+      <Text size="sm" tone="muted">
+        Disable if you want every visit to start from <code>defaultColorMode</code>.
+      </Text>
+    </Story>
+
     <Heading level={3}>MercanProvider props</Heading>
     <PropsTable
       rows={[
@@ -83,7 +104,9 @@ export const ThemingPage = () => (
         { prop: 'darkBrand', type: '{ primary?: string; secondary?: string }', description: 'Brand colors used only in dark mode. Falls back to `brand`.' },
         { prop: 'lightOverride', type: 'ThemeOverride', description: 'Deep merge into the light theme tokens.' },
         { prop: 'darkOverride', type: 'ThemeOverride', description: 'Deep merge into the dark theme tokens.' },
-        { prop: 'defaultColorMode', type: "'light' | 'dark'", defaultValue: "'light'", description: 'Initial color mode.' },
+        { prop: 'defaultColorMode', type: "'light' | 'dark'", defaultValue: "'light'", description: 'Initial color mode (used when nothing is persisted).' },
+        { prop: 'persistColorMode', type: 'boolean', defaultValue: 'true', description: 'Save chosen color mode to localStorage and rehydrate on next visit. Cross-tab sync via storage event.' },
+        { prop: 'colorModeStorageKey', type: 'string', defaultValue: "'mf-color-mode'", description: 'localStorage key for the persisted color mode.' },
         { prop: 'locale', type: 'string', description: 'Active locale key.' },
         { prop: 'fallbackLocale', type: 'string', description: 'Locale used when a key is missing.' },
         { prop: 'resources', type: 'I18nResources', description: 'Translations keyed by locale.' },
