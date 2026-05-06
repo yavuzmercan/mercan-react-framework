@@ -20,6 +20,9 @@ export const resources: I18nResources = {
       feedback: 'Feedback',
       navigation: 'Navigation',
       composed: 'Composed Example',
+      presets: 'Theme Presets',
+      datagrid: 'DataGrid — sortable & paginated',
+      responsive: 'Responsive Layouts',
     },
     actions: {
       primary: 'Primary',
@@ -76,6 +79,9 @@ export const resources: I18nResources = {
       feedback: 'Geri Bildirim',
       navigation: 'Navigasyon',
       composed: 'Birleşik Örnek',
+      presets: 'Tema Hazır Ayarları',
+      datagrid: 'DataGrid — sıralanabilir & sayfalı',
+      responsive: 'Duyarlı Yerleşimler',
     },
     actions: {
       primary: 'Birincil',

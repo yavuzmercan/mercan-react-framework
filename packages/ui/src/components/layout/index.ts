@@ -1,9 +1,11 @@
 export { Box } from './Box';
 export type { BoxProps } from './Box';
 export { Stack, HStack, VStack } from './Stack';
-export type { StackProps } from './Stack';
-export { Grid } from './Grid';
-export type { GridProps } from './Grid';
+export type { StackProps, StackDirection, StackJustify, StackAlign } from './Stack';
+export { Grid, GridItem } from './Grid';
+export type { GridProps, GridItemProps } from './Grid';
+export { Row, Col } from './RowCol';
+export type { RowProps, ColProps, ColSpan } from './RowCol';
 export { Divider } from './Divider';
 export type { DividerProps } from './Divider';
 export { Spacer } from './Spacer';

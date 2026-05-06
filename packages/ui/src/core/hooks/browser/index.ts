@@ -22,3 +22,5 @@ export {
   useBreakpointValue,
 } from './useBreakpoint';
 export type { BreakpointName } from './useBreakpoint';
+export { useResponsiveValue } from './useResponsiveValue';
+export type { ResponsiveValue } from './useResponsiveValue';

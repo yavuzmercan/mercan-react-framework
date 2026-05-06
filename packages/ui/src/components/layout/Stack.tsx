@@ -1,34 +1,43 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
-import { cx, v } from '../../core';
+import { cx, useResponsiveValue, v, type ResponsiveValue } from '../../core';
 import type { SpacingKey } from '../types';
 
+export type StackDirection = 'row' | 'column';
+export type StackJustify = 'start' | 'center' | 'end' | 'between' | 'around';
+export type StackAlign = 'start' | 'center' | 'end' | 'stretch';
+
 export interface StackProps extends HTMLAttributes<HTMLDivElement> {
-  direction?: 'row' | 'column';
-  gap?: SpacingKey;
-  justify?: 'start' | 'center' | 'end' | 'between' | 'around';
-  align?: 'start' | 'center' | 'end' | 'stretch';
-  wrap?: boolean;
+  direction?: ResponsiveValue<StackDirection>;
+  gap?: ResponsiveValue<SpacingKey>;
+  justify?: ResponsiveValue<StackJustify>;
+  align?: ResponsiveValue<StackAlign>;
+  wrap?: ResponsiveValue<boolean>;
   children?: ReactNode;
 }
 
 export const Stack = forwardRef<HTMLDivElement, StackProps>(
-  (
-    { direction = 'column', gap = 'md', justify, align, wrap, className, style, children, ...rest },
-    ref,
-  ) => (
-    <div
-      ref={ref}
-      className={cx('mf-stack', className)}
-      data-direction={direction}
-      data-justify={justify}
-      data-align={align}
-      data-wrap={wrap ? 'true' : undefined}
-      style={{ gap: v.space(gap), ...style }}
-      {...rest}
-    >
-      {children}
-    </div>
-  ),
+  ({ direction, gap, justify, align, wrap, className, style, children, ...rest }, ref) => {
+    const dir = useResponsiveValue(direction) ?? 'column';
+    const gp = useResponsiveValue(gap) ?? 'md';
+    const jstfy = useResponsiveValue(justify);
+    const algn = useResponsiveValue(align);
+    const wrp = useResponsiveValue(wrap);
+
+    return (
+      <div
+        ref={ref}
+        className={cx('mf-stack', className)}
+        data-direction={dir}
+        data-justify={jstfy}
+        data-align={algn}
+        data-wrap={wrp ? 'true' : undefined}
+        style={{ gap: v.space(gp as SpacingKey), ...style }}
+        {...rest}
+      >
+        {children}
+      </div>
+    );
+  },
 );
 Stack.displayName = 'Stack';
 

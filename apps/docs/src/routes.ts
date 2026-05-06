@@ -20,6 +20,7 @@ export const ROUTES: RouteSection[] = [
       { path: '/icons', label: 'Icons' },
       { path: '/fonts', label: 'Fonts' },
       { path: '/hooks', label: 'Hooks' },
+      { path: '/responsive', label: 'Responsive layouts' },
     ],
   },
   {

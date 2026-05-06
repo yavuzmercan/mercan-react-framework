@@ -6,6 +6,10 @@ import {
   VStack,
   Stack,
   Grid,
+  GridItem,
+  SimpleGrid,
+  Row,
+  Col,
   Box,
   Divider,
   Spacer,
@@ -52,9 +56,18 @@ import {
   Drawer,
   Accordion,
   AccordionItem,
+  DataGrid,
+  type DataGridColumn,
   useToast,
 } from '@yavuzmercan/ui/components';
-import { useColorMode, useTranslation } from '@yavuzmercan/ui';
+import {
+  useColorMode,
+  useTranslation,
+  useBreakpoint,
+  useBreakpointDown,
+  presets,
+  type PresetName,
+} from '@yavuzmercan/ui';
 import {
   Sun,
   Moon,
@@ -89,13 +102,25 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
   </Box>
 );
 
-const TopBar = () => {
+interface TopBarProps {
+  preset: 'system' | PresetName;
+  onPresetChange: (p: 'system' | PresetName) => void;
+}
+
+const TopBar = ({ preset, onPresetChange }: TopBarProps) => {
   const { t, locale, setLocale } = useTranslation();
   const { colorMode, toggleColorMode } = useColorMode();
+  const isMobile = useBreakpointDown('md');
+
+  const presetOptions = [
+    { value: 'system', label: 'Default' },
+    ...Object.entries(presets).map(([key, p]) => ({ value: key, label: p.name })),
+  ];
+
   return (
     <Box
       as="header"
-      px="xl"
+      px="lg"
       py="md"
       style={{
         position: 'sticky',
@@ -106,26 +131,38 @@ const TopBar = () => {
       }}
     >
       <Container size="xl">
-        <HStack align="center" gap="md">
+        <HStack align="center" gap="md" wrap>
           <Heading level={4}>{t('app.title')}</Heading>
           <Spacer />
+          {!isMobile && (
+            <Select
+              aria-label="Preset"
+              value={preset}
+              onChange={(e) => onPresetChange(e.target.value as 'system' | PresetName)}
+              options={presetOptions}
+              style={{ width: 140 }}
+            />
+          )}
           <Select
+            aria-label="Language"
             value={locale}
             onChange={(e) => setLocale(e.target.value)}
             options={[
               { value: 'en', label: 'English' },
               { value: 'tr', label: 'Türkçe' },
             ]}
-            style={{ width: 140 }}
+            style={{ width: 120 }}
           />
-          <Button
-            variant="outline"
-            colorScheme="secondary"
-            onClick={toggleColorMode}
-            leftIcon={colorMode === 'light' ? <Sun size={16} /> : <Moon size={16} />}
-          >
-            {colorMode === 'light' ? t('nav.light') : t('nav.dark')}
-          </Button>
+          <Tooltip label="Saved to localStorage — persists across reloads">
+            <Button
+              variant="outline"
+              colorScheme="secondary"
+              onClick={toggleColorMode}
+              leftIcon={colorMode === 'light' ? <Sun size={16} /> : <Moon size={16} />}
+            >
+              {colorMode === 'light' ? t('nav.light') : t('nav.dark')}
+            </Button>
+          </Tooltip>
         </HStack>
       </Container>
     </Box>
@@ -553,7 +590,264 @@ const ComposedSection = () => {
   );
 };
 
+interface PresetsSectionProps {
+  preset: 'system' | PresetName;
+  onPresetChange: (p: 'system' | PresetName) => void;
+}
+
+const PresetsSection = ({ preset, onPresetChange }: PresetsSectionProps) => {
+  const { t } = useTranslation();
+  return (
+    <Section title={t('sections.presets')}>
+      <VStack gap="md">
+        <Text tone="muted">
+          Eight built-in presets ship with Mercan UI. Click any tile to apply it instantly — light & dark variants are
+          included.
+        </Text>
+        <SimpleGrid minChildWidth={{ base: 220, md: 260 }} gap="md">
+          {(Object.entries(presets) as Array<[PresetName, (typeof presets)[PresetName]]>).map(([key, p]) => {
+            const isActive = preset === key;
+            return (
+              <Card key={key} shadow={isActive}>
+                <CardBody>
+                  <VStack gap="sm">
+                    <HStack align="center" gap="sm">
+                      <Heading level={5}>{p.name}</Heading>
+                      <Spacer />
+                      {isActive && (
+                        <Badge colorScheme="primary">
+                          <HStack gap="xs" align="center"><Check size={10} /> Active</HStack>
+                        </Badge>
+                      )}
+                    </HStack>
+                    <Text tone="muted" size="sm">{p.description ?? '—'}</Text>
+                    <Button
+                      size="sm"
+                      variant={isActive ? 'solid' : 'outline'}
+                      onClick={() => onPresetChange(isActive ? 'system' : key)}
+                    >
+                      {isActive ? 'Reset to default' : `Apply ${p.name}`}
+                    </Button>
+                  </VStack>
+                </CardBody>
+              </Card>
+            );
+          })}
+        </SimpleGrid>
+      </VStack>
+    </Section>
+  );
+};
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: 'Admin' | 'Editor' | 'Viewer';
+  status: 'active' | 'pending' | 'inactive';
+  createdAt: Date;
+}
+
+const SAMPLE_USERS: User[] = [
+  { id: 1, name: 'Ada Lovelace', email: 'ada@example.com', role: 'Admin', status: 'active', createdAt: new Date(2023, 1, 14) },
+  { id: 2, name: 'Linus Torvalds', email: 'linus@example.com', role: 'Admin', status: 'active', createdAt: new Date(2022, 8, 3) },
+  { id: 3, name: 'Grace Hopper', email: 'grace@example.com', role: 'Editor', status: 'active', createdAt: new Date(2024, 0, 22) },
+  { id: 4, name: 'Alan Turing', email: 'alan@example.com', role: 'Editor', status: 'pending', createdAt: new Date(2025, 5, 8) },
+  { id: 5, name: 'Margaret Hamilton', email: 'margaret@example.com', role: 'Viewer', status: 'active', createdAt: new Date(2024, 3, 17) },
+  { id: 6, name: 'Donald Knuth', email: 'don@example.com', role: 'Viewer', status: 'inactive', createdAt: new Date(2021, 11, 30) },
+  { id: 7, name: 'Edsger Dijkstra', email: 'edsger@example.com', role: 'Editor', status: 'active', createdAt: new Date(2023, 6, 4) },
+  { id: 8, name: 'Barbara Liskov', email: 'barbara@example.com', role: 'Admin', status: 'active', createdAt: new Date(2024, 9, 11) },
+  { id: 9, name: 'John Carmack', email: 'john@example.com', role: 'Viewer', status: 'pending', createdAt: new Date(2025, 2, 19) },
+  { id: 10, name: 'Anders Hejlsberg', email: 'anders@example.com', role: 'Editor', status: 'active', createdAt: new Date(2023, 4, 25) },
+  { id: 11, name: 'Brendan Eich', email: 'brendan@example.com', role: 'Admin', status: 'inactive', createdAt: new Date(2022, 2, 1) },
+  { id: 12, name: 'Rich Hickey', email: 'rich@example.com', role: 'Viewer', status: 'active', createdAt: new Date(2024, 7, 14) },
+];
+
+const statusToScheme: Record<User['status'], 'success' | 'warning' | 'neutral'> = {
+  active: 'success',
+  pending: 'warning',
+  inactive: 'neutral',
+};
+
+const DataGridSection = () => {
+  const { t, formatDate } = useTranslation();
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<Array<string | number>>([]);
+
+  const columns: DataGridColumn<User>[] = [
+    {
+      key: 'name',
+      header: 'User',
+      sortable: true,
+      cell: (row) => (
+        <HStack gap="sm" align="center">
+          <Avatar name={row.name} size="sm" />
+          <VStack gap="none">
+            <Text weight="medium" size="sm">{row.name}</Text>
+            <Text tone="muted" size="xs">{row.email}</Text>
+          </VStack>
+        </HStack>
+      ),
+    },
+    { key: 'role', header: 'Role', sortable: true },
+    {
+      key: 'status',
+      header: 'Status',
+      sortable: true,
+      cell: (row) => (
+        <Badge colorScheme={statusToScheme[row.status]}>
+          {row.status}
+        </Badge>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: 'Joined',
+      sortable: true,
+      sortAccessor: (row) => row.createdAt,
+      cell: (row) => formatDate(row.createdAt, { dateStyle: 'medium' }),
+      align: 'right',
+    },
+  ];
+
+  return (
+    <Section title={t('sections.datagrid')}>
+      <VStack gap="md">
+        <Text tone="muted">
+          Click any sortable header to cycle asc → desc → off. Selection, pagination, sticky header, and density are all
+          built-in. {selected.length > 0 && <strong>{selected.length} selected.</strong>}
+        </Text>
+        <Card>
+          <DataGrid<User>
+            data={SAMPLE_USERS}
+            columns={columns}
+            rowKey={(r) => r.id}
+            selectable="multiple"
+            selected={selected}
+            onSelectionChange={setSelected}
+            defaultSort={{ key: 'name', direction: 'asc' }}
+            striped
+            hover
+            density="comfortable"
+            pagination={{ pageSize: 5, page, onPageChange: setPage }}
+          />
+        </Card>
+      </VStack>
+    </Section>
+  );
+};
+
+const ResponsiveLayoutSection = () => {
+  const { t } = useTranslation();
+  const breakpoint = useBreakpoint();
+
+  return (
+    <Section title={t('sections.responsive')}>
+      <VStack gap="lg">
+        <HStack gap="sm" align="center" wrap>
+          <Text>Active breakpoint:</Text>
+          <Badge colorScheme="primary">
+            <code style={{ fontFamily: 'var(--mf-fonts-mono)' }}>{breakpoint}</code>
+          </Badge>
+          <Text tone="muted" size="sm">— resize the window to see layouts respond live.</Text>
+        </HStack>
+
+        <VStack gap="sm">
+          <Heading level={5}>Responsive Grid</Heading>
+          <Text tone="muted" size="sm">
+            <code>{`columns={{ base: 1, sm: 2, md: 3, lg: 4 }}`}</code>
+          </Text>
+          <Grid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap="md">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Box key={i} bg="surfaceAlt" radius="md" p="md" style={{ textAlign: 'center' }}>
+                <Text weight="medium">Tile {i + 1}</Text>
+              </Box>
+            ))}
+          </Grid>
+        </VStack>
+
+        <VStack gap="sm">
+          <Heading level={5}>Asymmetric Grid (GridItem)</Heading>
+          <Text tone="muted" size="sm">
+            <code>{`<GridItem colSpan={{ base: 1, md: 4 }}>`}</code> — hero spans full row on md+
+          </Text>
+          <Grid columns={{ base: 1, md: 4 }} gap="md">
+            <GridItem colSpan={{ base: 1, md: 4 }}>
+              <Box bg="surface" border radius="md" p="lg">
+                <Heading level={6}>Hero — full width on md+</Heading>
+                <Text tone="muted" size="sm">colSpan {`{ base: 1, md: 4 }`}</Text>
+              </Box>
+            </GridItem>
+            <GridItem colSpan={{ base: 1, md: 2 }}>
+              <Box bg="surface" border radius="md" p="md"><Text>Card — half on md+</Text></Box>
+            </GridItem>
+            <GridItem colSpan={{ base: 1, md: 1 }}>
+              <Box bg="surface" border radius="md" p="md"><Text>Card</Text></Box>
+            </GridItem>
+            <GridItem colSpan={{ base: 1, md: 1 }}>
+              <Box bg="surface" border radius="md" p="md"><Text>Card</Text></Box>
+            </GridItem>
+          </Grid>
+        </VStack>
+
+        <VStack gap="sm">
+          <Heading level={5}>Bootstrap-style Row + Col 12-grid</Heading>
+          <Text tone="muted" size="sm">
+            <code>{`<Col span={12} md={6} lg={4}>`}</code>
+          </Text>
+          <Row gutter="md">
+            <Col span={12} md={6} lg={4}>
+              <Box bg="surfaceAlt" radius="md" p="md"><Text>span 12 / md 6 / lg 4</Text></Box>
+            </Col>
+            <Col span={12} md={6} lg={4}>
+              <Box bg="surfaceAlt" radius="md" p="md"><Text>span 12 / md 6 / lg 4</Text></Box>
+            </Col>
+            <Col span={12} md={12} lg={4}>
+              <Box bg="surfaceAlt" radius="md" p="md"><Text>span 12 / md 12 / lg 4</Text></Box>
+            </Col>
+          </Row>
+          <Text tone="muted" size="sm">Sidebar pattern with offset:</Text>
+          <Row gutter="md">
+            <Col span={12} md={4} lg={3}>
+              <Box bg="surface" border radius="md" p="md"><Text weight="medium">Sidebar</Text></Box>
+            </Col>
+            <Col span={12} md={8} lg={9}>
+              <Box bg="surface" border radius="md" p="md"><Text weight="medium">Main content area</Text></Box>
+            </Col>
+          </Row>
+          <Text tone="muted" size="sm">Auto + fill — flex-style:</Text>
+          <Row gutter="md" align="center">
+            <Col span="auto">
+              <Avatar name="Mercan UI" size="sm" />
+            </Col>
+            <Col span="fill">
+              <Box bg="surfaceAlt" radius="md" p="sm"><Text>fill — grows to remaining space</Text></Box>
+            </Col>
+            <Col span="auto">
+              <Button size="sm" leftIcon={<Plus size={14} />}>Action</Button>
+            </Col>
+          </Row>
+        </VStack>
+
+        <VStack gap="sm">
+          <Heading level={5}>Stack with responsive direction</Heading>
+          <Text tone="muted" size="sm">
+            <code>{`direction={{ base: 'column', md: 'row' }}`}</code> — stacks vertically on mobile, horizontal on md+
+          </Text>
+          <Stack direction={{ base: 'column', md: 'row' }} gap="md">
+            <Box bg="surfaceAlt" radius="md" p="md" style={{ flex: 1 }}><Text>Pane A</Text></Box>
+            <Box bg="surfaceAlt" radius="md" p="md" style={{ flex: 1 }}><Text>Pane B</Text></Box>
+            <Box bg="surfaceAlt" radius="md" p="md" style={{ flex: 1 }}><Text>Pane C</Text></Box>
+          </Stack>
+        </VStack>
+      </VStack>
+    </Section>
+  );
+};
+
 export const App = () => {
+  const [preset, setPreset] = useState<'system' | PresetName>('system');
+
   return (
     <MercanProvider
       defaultColorMode="light"
@@ -563,19 +857,24 @@ export const App = () => {
       lightOverride={{
         radii: { md: '10px', lg: '14px' },
       }}
-      brand={{primary: '#006eb8ff', secondary: '#2d3142'}}
-      darkBrand={{primary: '#ff5a5f', secondary: '#2d3142'}}
+      brand={{ primary: '#006eb8ff', secondary: '#2d3142' }}
+      darkBrand={{ primary: '#ff5a5f', secondary: '#2d3142' }}
+      preset={preset === 'system' ? undefined : preset}
     >
-      <TopBar />
+      <TopBar preset={preset} onPresetChange={setPreset} />
       <Container size="xl">
         <Box py="xl">
           <VStack gap="md">
             <Heading level={1}>Mercan UI</Heading>
             <Text tone="muted" size="lg">
-              A theme-aware, i18n-ready React component framework. Toggle the theme and language above.
+              A theme-aware, i18n-ready React component framework. Toggle the theme, language, or preset above —
+              your choice persists across reloads.
             </Text>
           </VStack>
         </Box>
+        <PresetsSection preset={preset} onPresetChange={setPreset} />
+        <ResponsiveLayoutSection />
+        <DataGridSection />
         <ButtonsSection />
         <TypographySection />
         <FormsSection />

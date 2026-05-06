@@ -34,6 +34,29 @@
 .mf-stack[data-align="stretch"] { align-items: stretch; }
 
 .mf-grid { display: grid; }
+.mf-grid-item { /* span/start/end set inline via style */ }
+
+.mf-row {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.mf-row[data-justify="start"] { justify-content: flex-start; }
+.mf-row[data-justify="center"] { justify-content: center; }
+.mf-row[data-justify="end"] { justify-content: flex-end; }
+.mf-row[data-justify="between"] { justify-content: space-between; }
+.mf-row[data-justify="around"] { justify-content: space-around; }
+.mf-row[data-align="start"] { align-items: flex-start; }
+.mf-row[data-align="center"] { align-items: center; }
+.mf-row[data-align="end"] { align-items: flex-end; }
+.mf-row[data-align="stretch"] { align-items: stretch; }
+.mf-row[data-reverse="true"] { flex-direction: row-reverse; }
+
+.mf-col {
+  /* flex-basis / max-width set inline for responsive precision */
+  flex-shrink: 0;
+  min-width: 0;
+}
 
 .mf-divider {
   background: var(--mf-color-border);

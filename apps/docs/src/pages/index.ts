@@ -8,6 +8,7 @@ import { FontsPage } from './Fonts';
 import { HooksPage } from './Hooks';
 import { DataGridPage } from './DataGridPage';
 import { PresetsPage } from './Presets';
+import { ResponsiveLayoutPage } from './ResponsiveLayout';
 import { BoxPage, StackPage, GridPage, DividerPage, ContainerPage } from './Layout';
 import { TextPage, HeadingPage } from './Typography';
 import {
@@ -40,6 +41,7 @@ export const PAGES: Record<string, ComponentType> = {
   '/install': InstallPage,
   '/theming': ThemingPage,
   '/presets': PresetsPage,
+  '/responsive': ResponsiveLayoutPage,
   '/i18n': I18nPage,
   '/icons': IconsPage,
   '/fonts': FontsPage,
