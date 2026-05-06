@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { MercanProvider, BackToTop } from '@yavuzmercan/ui';
+import { useEffect, useState } from 'react';
+import { MercanProvider, BackToTop, useBreakpointDown } from '@yavuzmercan/ui';
+import { MenuIcon, X } from '@yavuzmercan/ui/icons';
 import { HashRouter, useRouter } from './router';
 import { ROUTES } from './routes';
 import { PAGES } from './pages';
@@ -14,10 +15,15 @@ const resources = {
   },
 };
 
-const Sidebar = () => {
+interface SidebarProps {
+  mobileOpen: boolean;
+  onClose: () => void;
+}
+
+const Sidebar = ({ mobileOpen, onClose }: SidebarProps) => {
   const { path, navigate } = useRouter();
   return (
-    <nav className="docs-side">
+    <nav className="docs-side" data-mobile-open={mobileOpen ? 'true' : undefined}>
       {ROUTES.map((section) => (
         <div key={section.section}>
           <div className="docs-section-title">{section.section}</div>
@@ -27,7 +33,10 @@ const Sidebar = () => {
               type="button"
               className="docs-nav-link"
               data-active={path === entry.path ? 'true' : undefined}
-              onClick={() => navigate(entry.path)}
+              onClick={() => {
+                navigate(entry.path);
+                onClose();
+              }}
             >
               {entry.label}
             </button>
@@ -65,16 +74,45 @@ const Logo = () => (
   </div>
 );
 
-const Shell = ({ state, setState }: { state: CustomizerState; setState: (s: CustomizerState) => void }) => (
-  <div className="docs-shell">
-    <Logo />
-    <div className="docs-top">
-      <ThemeCustomizer state={state} onChange={setState} />
+const Shell = ({ state, setState }: { state: CustomizerState; setState: (s: CustomizerState) => void }) => {
+  const isMobile = useBreakpointDown('md');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const { path } = useRouter();
+
+  // Auto-close drawer when route changes (mobile)
+  useEffect(() => {
+    if (isMobile) setMobileSidebarOpen(false);
+  }, [path, isMobile]);
+
+  // Close drawer on resize back to desktop
+  useEffect(() => {
+    if (!isMobile) setMobileSidebarOpen(false);
+  }, [isMobile]);
+
+  return (
+    <div className="docs-shell">
+      <Logo />
+      <div className="docs-top">
+        <button
+          type="button"
+          className="docs-hamburger"
+          onClick={() => setMobileSidebarOpen((v) => !v)}
+          aria-label={mobileSidebarOpen ? 'Close menu' : 'Open menu'}
+        >
+          {mobileSidebarOpen ? <X size={18} /> : <MenuIcon size={18} />}
+        </button>
+        <ThemeCustomizer state={state} onChange={setState} />
+      </div>
+      <Sidebar mobileOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
+      <div
+        className="docs-side-overlay"
+        data-mobile-open={mobileSidebarOpen ? 'true' : undefined}
+        onClick={() => setMobileSidebarOpen(false)}
+      />
+      <Page />
     </div>
-    <Sidebar />
-    <Page />
-  </div>
-);
+  );
+};
 
 export const App = () => {
   const [customizer, setCustomizer] = useState<CustomizerState>({

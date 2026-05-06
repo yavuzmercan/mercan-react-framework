@@ -160,3 +160,103 @@ html, body, #root { height: 100%; margin: 0; }
 }
 .theme-customizer label { display: flex; align-items: center; gap: 6px; font-size: var(--mf-fs-sm); color: var(--mf-color-textMuted); }
 .color-input { width: 40px; height: 28px; border: 1px solid var(--mf-color-border); border-radius: 4px; padding: 2px; background: transparent; cursor: pointer; }
+
+/* Hamburger button shown only on mobile */
+.docs-hamburger {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--mf-color-border);
+  border-radius: var(--mf-radius-sm);
+  padding: 6px 8px;
+  color: var(--mf-color-text);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile sidebar drawer overlay (≤768px) */
+.docs-side-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--mf-color-overlay);
+  z-index: 1300;
+}
+
+/* ============ Responsive — docs ≤768px ============ */
+@media (max-width: 767.98px) {
+  .docs-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 56px 1fr;
+    grid-template-areas: "top" "main";
+  }
+
+  /* Hide logo cell — brand goes into top bar */
+  .docs-logo {
+    display: none;
+  }
+
+  .docs-top {
+    padding: 0 var(--mf-spacing-md);
+    gap: var(--mf-spacing-xs);
+    overflow-x: auto;
+  }
+
+  .docs-hamburger {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  /* Sidebar becomes a drawer — slides in from the left */
+  .docs-side {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    z-index: 1400;
+    transform: translateX(-100%);
+    transition: transform var(--mf-dur-normal) ease;
+    box-shadow: var(--mf-shadow-lg);
+  }
+  .docs-side[data-mobile-open="true"] {
+    transform: translateX(0);
+  }
+  .docs-side-overlay[data-mobile-open="true"] {
+    display: block;
+  }
+
+  .docs-main {
+    padding: var(--mf-spacing-lg) var(--mf-spacing-md);
+  }
+
+  /* Theme customizer on mobile — wrap, smaller controls */
+  .theme-customizer {
+    padding: var(--mf-spacing-sm) var(--mf-spacing-md);
+    gap: var(--mf-spacing-sm);
+  }
+  .theme-customizer label {
+    gap: 4px;
+  }
+
+  /* Story preview — tighter padding */
+  .story-preview {
+    padding: var(--mf-spacing-lg) var(--mf-spacing-md);
+  }
+  .story-title {
+    padding: var(--mf-spacing-sm) var(--mf-spacing-md);
+  }
+  .story-code {
+    padding: var(--mf-spacing-sm) var(--mf-spacing-md);
+    font-size: 12px;
+  }
+
+  /* Props tables — horizontal scroll if content overflows */
+  .props-table {
+    font-size: var(--mf-fs-xs);
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

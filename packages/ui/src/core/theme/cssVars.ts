@@ -21,6 +21,7 @@ export const themeToCssVars = (theme: Theme): Record<string, string> => ({
   ...flatten(theme.shadows, 'shadow'),
   ...flatten(theme.zIndices, 'z'),
   ...flatten(theme.durations, 'dur'),
+  ...flatten(theme.breakpoints, 'bp'),
 });
 
 export const v = {
@@ -34,4 +35,5 @@ export const v = {
   shadow: (key: keyof Theme['shadows']) => `var(${PREFIX}-shadow-${String(key)})`,
   z: (key: keyof Theme['zIndices']) => `var(${PREFIX}-z-${String(key)})`,
   dur: (key: keyof Theme['durations']) => `var(${PREFIX}-dur-${String(key)})`,
+  bp: (key: keyof Theme['breakpoints']) => `var(${PREFIX}-bp-${String(key)})`,
 };

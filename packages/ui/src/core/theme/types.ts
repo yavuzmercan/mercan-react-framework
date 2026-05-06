@@ -42,6 +42,7 @@ export interface Theme {
   shadows: Tokens['shadows'];
   zIndices: Tokens['zIndices'];
   durations: Tokens['durations'];
+  breakpoints: Tokens['breakpoints'];
 }
 
 export type ThemeOverride = Partial<{

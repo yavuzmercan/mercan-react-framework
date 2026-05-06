@@ -15,3 +15,10 @@ export type { UseClipboardReturn } from './useClipboard';
 export { useScript } from './useScript';
 export type { ScriptStatus } from './useScript';
 export { usePrefersReducedMotion } from './usePrefersReducedMotion';
+export {
+  useBreakpoint,
+  useBreakpointUp,
+  useBreakpointDown,
+  useBreakpointValue,
+} from './useBreakpoint';
+export type { BreakpointName } from './useBreakpoint';

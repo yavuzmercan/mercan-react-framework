@@ -8,6 +8,8 @@ export interface Tokens {
   shadows: Record<'none' | 'sm' | 'md' | 'lg' | 'xl', string>;
   zIndices: Record<'base' | 'dropdown' | 'sticky' | 'overlay' | 'modal' | 'popover' | 'toast' | 'tooltip', string>;
   durations: Record<'fast' | 'normal' | 'slow', string>;
+  /** Min-width breakpoints for responsive design. */
+  breakpoints: Record<'sm' | 'md' | 'lg' | 'xl' | '2xl', string>;
 }
 
 export const baseTokens: Tokens = {
@@ -78,5 +80,12 @@ export const baseTokens: Tokens = {
     fast: '120ms',
     normal: '200ms',
     slow: '320ms',
+  },
+  breakpoints: {
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
+    '2xl': '1536px',
   },
 };

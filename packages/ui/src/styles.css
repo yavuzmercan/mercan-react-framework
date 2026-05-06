@@ -1474,4 +1474,152 @@
   font-family: var(--mf-font-heading);
 }
 
+/* ============ Responsive — mobile (≤768px) ============
+   Layout components collapse to single-column or full-width on small screens.
+   Breakpoint matches `theme.breakpoints.md` (768px). */
+@media (max-width: 767.98px) {
+  /* AppShell — sidebar hidden, main becomes full-width */
+  .mf-appshell {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "nav" "main" "foot" !important;
+  }
+  .mf-appshell-side {
+    display: none;
+  }
+  .mf-appshell-main {
+    padding: var(--mf-spacing-md);
+  }
+
+  /* Container — tighter horizontal padding */
+  .mf-container {
+    padding-inline: var(--mf-spacing-md);
+  }
+
+  /* NavBar — compact padding */
+  .mf-navbar {
+    padding: var(--mf-spacing-sm) var(--mf-spacing-md);
+    gap: var(--mf-spacing-sm);
+  }
+  .mf-navbar-nav {
+    /* Hide nav links by default on mobile — apps should provide a hamburger */
+    display: none;
+  }
+
+  /* Modal — fullscreen-ish, no big margins */
+  .mf-modal-overlay {
+    padding: var(--mf-spacing-sm);
+    align-items: flex-end;  /* bottom sheet feel */
+  }
+  .mf-modal {
+    max-width: 100% !important;
+    max-height: 92vh;
+    width: 100%;
+  }
+  .mf-modal-header,
+  .mf-modal-body,
+  .mf-modal-footer {
+    padding: var(--mf-spacing-md);
+  }
+
+  /* Drawer — wider on mobile (almost fullscreen) */
+  .mf-drawer[data-side="left"],
+  .mf-drawer[data-side="right"] {
+    width: min(85vw, 360px);
+  }
+  .mf-drawer[data-side="top"],
+  .mf-drawer[data-side="bottom"] {
+    height: min(80vh, 420px);
+  }
+
+  /* Toast — full width on mobile */
+  .mf-toast-region[data-position="top-right"],
+  .mf-toast-region[data-position="top-left"] {
+    top: var(--mf-spacing-sm);
+    left: var(--mf-spacing-sm);
+    right: var(--mf-spacing-sm);
+  }
+  .mf-toast-region[data-position="bottom-right"],
+  .mf-toast-region[data-position="bottom-left"] {
+    bottom: var(--mf-spacing-sm);
+    left: var(--mf-spacing-sm);
+    right: var(--mf-spacing-sm);
+  }
+  .mf-toast {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* CommandPalette — fullscreen on mobile */
+  .mf-cmd-overlay {
+    padding-top: 0;
+    align-items: stretch;
+  }
+  .mf-cmd-modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  /* Footer — stacked layout */
+  .mf-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* DataGrid — readable on tight screens */
+  .mf-datagrid-table {
+    font-size: var(--mf-fs-xs);
+  }
+  .mf-datagrid-th,
+  .mf-datagrid-td {
+    padding: var(--mf-spacing-xs) var(--mf-spacing-sm);
+  }
+  .mf-datagrid-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--mf-spacing-sm);
+  }
+
+  /* Stepper — compact, hide labels for >3 steps */
+  .mf-stepper {
+    overflow-x: auto;
+  }
+
+  /* Tabs — scroll horizontally if too many */
+  .mf-tablist {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+  }
+  .mf-tab {
+    flex-shrink: 0;
+  }
+
+  /* CodeBlock & Code block — readable on small screens */
+  .mf-code-block,
+  .mf-codeblock pre {
+    font-size: 12px;
+    padding: var(--mf-spacing-sm);
+  }
+
+  /* Popover/Menu — wider tap targets */
+  .mf-menu-item,
+  .mf-cmd-item {
+    padding: var(--mf-spacing-sm) var(--mf-spacing-md);
+  }
+
+  /* HoverCard — convert to popover-style */
+  .mf-hover-card {
+    min-width: 0;
+    max-width: calc(100vw - var(--mf-spacing-lg));
+  }
+}
+
+/* Tablet adjustments (640–1023px) */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .mf-appshell {
+    grid-template-columns: 200px 1fr;
+  }
+}
+
 
