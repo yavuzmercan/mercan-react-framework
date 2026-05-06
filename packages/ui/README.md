@@ -5,10 +5,16 @@ Theme-aware, i18n-ready React UI framework for the web. **One install — everyt
 [![npm version](https://img.shields.io/npm/v/@yavuzmercan/ui.svg?style=flat-square)](https://www.npmjs.com/package/@yavuzmercan/ui)
 [![license](https://img.shields.io/npm/l/@yavuzmercan/ui.svg?style=flat-square)](./LICENSE)
 
+## 📖 [Live documentation → yavuzmercan.github.io/mercan-react-framework](https://yavuzmercan.github.io/mercan-react-framework/)
+
+> Live demos for every component, theme customizer, copy-paste examples, and complete API reference. **Start there.**
+
+---
+
 - **70+ components** — layout, forms, feedback, navigation, data display
 - **88+ icons** — tree-shakeable SVG, inherit `currentColor`
 - **55+ hooks** — state, storage, async, DOM, browser APIs, lifecycle
-- **Theme** — design tokens as CSS variables, single brand color → full palette, light/dark
+- **Theme** — design tokens as CSS variables, single brand color → full palette, light/dark, **persisted across reloads**
 - **i18n** — interpolation, pluralization, locale switching, no extra dependency
 - **Google Fonts** — `googleFonts={{ body: 'Inter' }}` and you're done
 - **Accessible** — focus traps, ARIA, keyboard nav (arrow keys in Tabs/Menu)
@@ -248,6 +254,8 @@ MIT © Yavuz Mercan
 
 ## Links
 
+- 📖 [Live documentation](https://yavuzmercan.github.io/mercan-react-framework/)
 - 🌐 [GitHub repository](https://github.com/yavuzmercan/mercan-react-framework)
 - 🐛 [Report an issue](https://github.com/yavuzmercan/mercan-react-framework/issues)
 - 📦 [npm package](https://www.npmjs.com/package/@yavuzmercan/ui)
+- 📋 [CHANGELOG](./CHANGELOG.md)

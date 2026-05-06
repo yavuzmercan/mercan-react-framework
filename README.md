@@ -2,11 +2,18 @@
 
 [![npm](https://img.shields.io/npm/v/@yavuzmercan/ui.svg?style=flat-square)](https://www.npmjs.com/package/@yavuzmercan/ui)
 [![CI](https://github.com/yavuzmercan/mercan-react-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/yavuzmercan/mercan-react-framework/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-live-3b6cff?style=flat-square)](https://yavuzmercan.github.io/mercan-react-framework/)
 [![license](https://img.shields.io/npm/l/@yavuzmercan/ui.svg?style=flat-square)](./LICENSE)
 
 Theme-aware, i18n-ready React UI framework for the web — published as a single package: **[`@yavuzmercan/ui`](https://www.npmjs.com/package/@yavuzmercan/ui)**.
 
 > 70+ components · 88 icons · 55 hooks · theme/i18n/Google Fonts in one install.
+
+## 📖 [Live documentation → yavuzmercan.github.io/mercan-react-framework](https://yavuzmercan.github.io/mercan-react-framework/)
+
+Live demos for every component, theme customizer, copy-paste examples, complete API reference.
+
+---
 
 This repository is the monorepo that develops the package, hosts the showcase apps, and runs CI/release. **If you just want to use the framework**, install from npm:
 
@@ -14,7 +21,7 @@ This repository is the monorepo that develops the package, hosts the showcase ap
 npm install @yavuzmercan/ui
 ```
 
-…and read the package [README](./packages/ui/README.md) or [npm page](https://www.npmjs.com/package/@yavuzmercan/ui).
+…and read the [live docs](https://yavuzmercan.github.io/mercan-react-framework/) or the package [README](./packages/ui/README.md).
 
 The rest of this document is for **contributors and maintainers**.
 
@@ -132,8 +139,8 @@ MIT © Yavuz Mercan
 
 ## Links
 
+- 📖 [Live documentation](https://yavuzmercan.github.io/mercan-react-framework/)
 - 📦 [npm package](https://www.npmjs.com/package/@yavuzmercan/ui)
-- 📖 [Package README](./packages/ui/README.md)
 - 📋 [CHANGELOG](./packages/ui/CHANGELOG.md)
 - 🚀 [Release process](./RELEASING.md)
 - 🐛 [Issues](https://github.com/yavuzmercan/mercan-react-framework/issues)
