@@ -1,5 +1,11 @@
 # @yavuzmercan/ui
 
+## 0.3.1
+
+### Patch Changes
+
+- 88d3072: Test automated CI publish flow
+
 ## 0.3.0
 
 ### Minor Changes
