@@ -32,12 +32,6 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
 
-      - name: Configure npm authentication
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
-          echo "always-auth=true" >> ~/.npmrc
-
       - name: Verify npm auth
         run: npm whoami
         env:
