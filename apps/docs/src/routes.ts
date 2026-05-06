@@ -15,6 +15,7 @@ export const ROUTES: RouteSection[] = [
       { path: '/', label: 'Introduction' },
       { path: '/install', label: 'Installation' },
       { path: '/theming', label: 'Theming' },
+      { path: '/presets', label: 'Theme presets' },
       { path: '/i18n', label: 'i18n' },
       { path: '/icons', label: 'Icons' },
       { path: '/fonts', label: 'Fonts' },
@@ -91,6 +92,7 @@ export const ROUTES: RouteSection[] = [
       { path: '/timeline', label: 'Timeline' },
       { path: '/list', label: 'List' },
       { path: '/table', label: 'Table' },
+      { path: '/datagrid', label: 'DataGrid' },
     ],
   },
   {

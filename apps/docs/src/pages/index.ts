@@ -6,6 +6,8 @@ import { I18nPage } from './I18n';
 import { IconsPage } from './Icons';
 import { FontsPage } from './Fonts';
 import { HooksPage } from './Hooks';
+import { DataGridPage } from './DataGridPage';
+import { PresetsPage } from './Presets';
 import { BoxPage, StackPage, GridPage, DividerPage, ContainerPage } from './Layout';
 import { TextPage, HeadingPage } from './Typography';
 import {
@@ -37,6 +39,7 @@ export const PAGES: Record<string, ComponentType> = {
   '/': IntroPage,
   '/install': InstallPage,
   '/theming': ThemingPage,
+  '/presets': PresetsPage,
   '/i18n': I18nPage,
   '/icons': IconsPage,
   '/fonts': FontsPage,
@@ -97,6 +100,7 @@ export const PAGES: Record<string, ComponentType> = {
   '/timeline': TimelinePage,
   '/list': ListPage,
   '/table': TablePage,
+  '/datagrid': DataGridPage,
 
   '/alert': AlertPage,
   '/banner': BannerPage,

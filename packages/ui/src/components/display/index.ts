@@ -42,3 +42,11 @@ export { CodeBlock } from './CodeBlock';
 export type { CodeBlockProps } from './CodeBlock';
 export { Highlight } from './Highlight';
 export type { HighlightProps } from './Highlight';
+export { DataGrid } from './DataGrid';
+export type {
+  DataGridProps,
+  DataGridColumn,
+  DataGridSort,
+  DataGridPagination,
+  SortDirection,
+} from './DataGrid';

@@ -1,7 +1,7 @@
 import { Heading, Text, VStack, Alert } from '@yavuzmercan/ui';
 import { Story } from '../Story';
 
-const PKG = `npm install @yavuzmercan/ui @yavuzmercan/ui @yavuzmercan/ui`;
+const PKG = `npm install @yavuzmercan/ui`;
 
 const SETUP = `import '@yavuzmercan/ui/styles.css';
 import { MercanProvider } from '@yavuzmercan/ui';

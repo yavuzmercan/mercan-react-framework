@@ -5,10 +5,12 @@ import {
   createBrandPalette,
   fontStack,
   loadGoogleFonts,
+  presets,
   type ColorMode,
   type GoogleFontConfig,
   type I18nResources,
   type Locale,
+  type PresetName,
   type ThemeOverride,
 } from '../core';
 import { ToastProvider, type ToastPosition } from './feedback/Toast';
@@ -40,6 +42,8 @@ export interface MercanProviderProps {
   darkOverride?: ThemeOverride;
   /** Auto-loads Google Fonts and wires them into theme.fonts. */
   googleFonts?: GoogleFontsConfig;
+  /** Apply a built-in theme preset (Solarized, Nord, Dracula, GitHub, etc.). Merged before brand/fonts/overrides. */
+  preset?: PresetName;
   /** Persist the chosen color mode to localStorage and rehydrate on next visit. Default `true`. */
   persistColorMode?: boolean;
   /** localStorage key for persisted color mode. Default `'mf-color-mode'`. */
@@ -91,8 +95,8 @@ const fontsToOverride = (config: GoogleFontsConfig | undefined): ThemeOverride |
   return { fonts };
 };
 
-const mergeOverrides = (a?: ThemeOverride, b?: ThemeOverride, c?: ThemeOverride): ThemeOverride | undefined => {
-  const all = [a, b, c].filter(Boolean) as ThemeOverride[];
+const mergeOverrides = (...overrides: Array<ThemeOverride | undefined>): ThemeOverride | undefined => {
+  const all = overrides.filter(Boolean) as ThemeOverride[];
   if (all.length === 0) return undefined;
   return all.reduce<ThemeOverride>((acc, cur) => ({
     ...acc,
@@ -110,6 +114,7 @@ export const MercanProvider = ({
   lightOverride,
   darkOverride,
   googleFonts,
+  preset,
   persistColorMode = true,
   colorModeStorageKey,
   locale,
@@ -129,14 +134,17 @@ export const MercanProvider = ({
   }, [googleFonts]);
 
   const fontsOverride = useMemo(() => fontsToOverride(googleFonts), [googleFonts]);
+  const presetLight = preset ? presets[preset]?.light : undefined;
+  const presetDark = preset ? presets[preset]?.dark : undefined;
 
+  // Precedence (last wins): preset → brand → fonts → user override
   const mergedLight = useMemo(
-    () => mergeOverrides(brandToOverride(brand, 'light'), fontsOverride, lightOverride),
-    [brand, fontsOverride, lightOverride],
+    () => mergeOverrides(presetLight, brandToOverride(brand, 'light'), fontsOverride, lightOverride),
+    [presetLight, brand, fontsOverride, lightOverride],
   );
   const mergedDark = useMemo(
-    () => mergeOverrides(brandToOverride(darkBrand ?? brand, 'dark'), fontsOverride, darkOverride),
-    [darkBrand, brand, fontsOverride, darkOverride],
+    () => mergeOverrides(presetDark, brandToOverride(darkBrand ?? brand, 'dark'), fontsOverride, darkOverride),
+    [presetDark, darkBrand, brand, fontsOverride, darkOverride],
   );
 
   return (

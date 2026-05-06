@@ -97,6 +97,12 @@ export const contrastColor = (hex: string, light = '#ffffff', dark = '#0b0d12'):
   return luminance > 0.6 ? dark : light;
 };
 
+/** Convert a hex color to an rgba() string with the given alpha (0–1). */
+export const rgba = (hex: string, alpha: number): string => {
+  const { r, g, b } = parseColor(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export interface BrandPalette {
   primary: string;
   primaryHover: string;
