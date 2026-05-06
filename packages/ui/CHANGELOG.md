@@ -1,5 +1,116 @@
 # @yavuzmercan/ui
 
+## 0.5.0
+
+### Minor Changes
+
+- e59d1cc: feat: add `DataGrid` component for sortable, paginated, selectable data tables
+
+  The existing `Table` is for simple key/value-style data. `DataGrid` is for real-world dashboard tables — everything you actually need:
+
+  - **Sortable columns** — click header to cycle asc / desc / none
+  - **Built-in pagination** — `pagination={{ pageSize: 10 }}` and you're done
+  - **Row selection** — `selectable="single"` or `"multiple"` with header select-all + indeterminate state
+  - **Loading skeletons** — `loading` prop renders `loadingRows` placeholder rows
+  - **Empty state** — customizable `emptyState` / `emptyMessage`
+  - **Density** — `compact` or `comfortable`
+  - **Sticky header** — `stickyHeader` + `maxHeight` for long lists
+  - **Striped + hover** — visual options
+  - **Server-side mode** — `manualSort` + `manualPagination` for fetched data with controlled state
+
+  ```tsx
+  <DataGrid<User>
+    data={users}
+    columns={[
+      {
+        key: "name",
+        header: "Name",
+        sortable: true,
+        cell: (u) => <UserCell user={u} />,
+      },
+      { key: "role", header: "Role", sortable: true, width: 100 },
+      {
+        key: "status",
+        header: "Status",
+        cell: (u) => <Badge>{u.status}</Badge>,
+      },
+    ]}
+    rowKey={(u) => u.id}
+    selectable="multiple"
+    selected={selected}
+    onSelectionChange={setSelected}
+    pagination={{ pageSize: 20 }}
+    defaultSort={{ key: "name", direction: "asc" }}
+  />
+  ```
+
+  Fully typed generic — TypeScript infers row type from `data`. Works alongside the existing `Table` (kept for minimal cases).
+
+- e59d1cc: feat: 8 built-in theme presets
+
+  One prop, full theme. Each preset ships with both light and dark color sets:
+
+  - `solarized` — Ethan Schoonover's classic
+  - `nord` — Arctic-inspired, blue-gray
+  - `dracula` — Vibrant pink/purple dark theme
+  - `github` — Familiar light + dark
+  - `monokai` — Editor classic
+  - `material` — Material Design 3
+  - `tailwind` — Slate + blue, modern web standard
+  - `oneDark` — Atom/VS Code "One"
+
+  ```tsx
+  // Shorthand
+  <MercanProvider preset="nord" locale="en" resources={{}}>
+    <App />
+  </MercanProvider>
+
+  // Composable — mix light from one preset with dark from another
+  import { presets } from '@yavuzmercan/ui';
+  <MercanProvider
+    lightOverride={presets.solarized.light}
+    darkOverride={presets.dracula.dark}
+    ...
+  />
+
+  // Preset + brand override on top — your brand wins for primary
+  <MercanProvider preset="nord" brand={{ primary: '#ff5a5f' }} ... />
+  ```
+
+  Override precedence (last wins): preset → brand → fonts → user `lightOverride`/`darkOverride`.
+
+  For custom presets, the new `createPresetColors` helper expands ~12 inputs into all 26 theme color slots — hover, active, contrast, focus-ring values are derived automatically:
+
+  ```tsx
+  import { createPresetColors, type ThemePreset } from "@yavuzmercan/ui";
+
+  export const myBrand: ThemePreset = {
+    name: "My Brand",
+    light: {
+      colors: createPresetColors({
+        mode: "light",
+        background: "#fff",
+        primary: "#ff5a5f" /* ... */,
+      }),
+    },
+    dark: {
+      /* ... */
+    },
+  };
+  ```
+
+  Also exports `rgba(hex, alpha)` color util for convenience.
+
+### Patch Changes
+
+- e59d1cc: fix: theme fonts now apply inside portal-rendered components
+
+  `Modal`, `Drawer`, `Toast`, and `CommandPalette` render directly into `document.body` via React portals, so they escaped `.mf-root`'s `font-family` inheritance — when a user set `googleFonts={{ body: 'Inter' }}` or overrode `theme.fonts.body`, the modal/drawer/toast still showed the browser default font.
+
+  Portal containers (`.mf-modal-overlay`, `.mf-drawer-overlay`, `.mf-drawer`, `.mf-toast-region`, `.mf-cmd-overlay`) now explicitly set `font-family: var(--mf-font-body)` and `color: var(--mf-color-text)`, and modal/drawer titles get `var(--mf-font-heading)`. Inline floaters (`Tooltip`, `Popover`, `Menu`, `HoverCard`) get the same body-font rule defensively.
+
+  No API change — this is purely a styling fix. Existing CSS variable overrides keep working as before.
+
 ## 0.4.1
 
 ### Patch Changes

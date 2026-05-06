@@ -1,6 +1,6 @@
 {
   "name": "@yavuzmercan/ui",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Theme-aware, i18n-ready React UI framework — 70+ components, 88+ icons, design tokens, Google Fonts loader. One install, everything included.",
   "keywords": [
     "react",
