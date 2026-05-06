@@ -1,5 +1,0 @@
----
-"@yavuzmercan/ui": patch
----
-
-uptade
