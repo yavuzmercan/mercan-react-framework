@@ -1,5 +1,11 @@
 # @yavuzmercan/ui
 
+## 0.7.1
+
+### Patch Changes
+
+- 32094b1: responsive upgrade
+
 ## 0.7.0
 
 ### Minor Changes
