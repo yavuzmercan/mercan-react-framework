@@ -25,19 +25,30 @@ export interface RowProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const Row = forwardRef<HTMLDivElement, RowProps>(
-  ({ gutter = 'md', justify, align, reverse, className, style, children, ...rest }, ref) => (
-    <div
-      ref={ref}
-      className={cx('mf-row', className)}
-      data-justify={justify}
-      data-align={align}
-      data-reverse={reverse ? 'true' : undefined}
-      style={{ gap: v.space(gutter), ...style }}
-      {...rest}
-    >
-      {children}
-    </div>
-  ),
+  ({ gutter = 'md', justify, align, reverse, className, style, children, ...rest }, ref) => {
+    const gutterValue = v.space(gutter);
+    return (
+      <div
+        ref={ref}
+        className={cx('mf-row', className)}
+        data-justify={justify}
+        data-align={align}
+        data-reverse={reverse ? 'true' : undefined}
+        style={{
+          // Bootstrap-style gutter: negative outer margin on Row +
+          // inner padding on Cols (via CSS in styles.css) so percentage
+          // flex-basis values still add up correctly.
+          ['--mf-row-gutter' as any]: gutterValue,
+          marginInline: `calc(${gutterValue} / -2)`,
+          rowGap: gutterValue,
+          ...style,
+        }}
+        {...rest}
+      >
+        {children}
+      </div>
+    );
+  },
 );
 Row.displayName = 'Row';
 

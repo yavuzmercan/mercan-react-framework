@@ -53,9 +53,13 @@
 .mf-row[data-reverse="true"] { flex-direction: row-reverse; }
 
 .mf-col {
-  /* flex-basis / max-width set inline for responsive precision */
+  /* flex-basis / max-width set inline for responsive precision.
+     Inner gutter padding consumes the Row's negative outer margin so
+     percentage-based flex-basis still adds up to 100% across siblings. */
   flex-shrink: 0;
   min-width: 0;
+  box-sizing: border-box;
+  padding-inline: calc(var(--mf-row-gutter, 0px) / 2);
 }
 
 .mf-divider {
