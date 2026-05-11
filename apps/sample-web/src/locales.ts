@@ -23,6 +23,7 @@ export const resources: I18nResources = {
       presets: 'Theme Presets',
       datagrid: 'DataGrid — sortable & paginated',
       responsive: 'Responsive Layouts',
+      validatedForm: 'Validated form — useForm + Combobox + DatePicker',
     },
     actions: {
       primary: 'Primary',
@@ -82,6 +83,7 @@ export const resources: I18nResources = {
       presets: 'Tema Hazır Ayarları',
       datagrid: 'DataGrid — sıralanabilir & sayfalı',
       responsive: 'Duyarlı Yerleşimler',
+      validatedForm: 'Doğrulamalı form — useForm + Combobox + DatePicker',
     },
     actions: {
       primary: 'Birincil',

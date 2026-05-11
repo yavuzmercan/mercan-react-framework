@@ -1,12 +1,29 @@
 import { Switch } from '@yavuzmercan/ui';
 import { useColorMode } from '@yavuzmercan/ui';
+import type { PresetName } from '@yavuzmercan/ui';
 
 export interface CustomizerState {
   primary: string;
   secondary: string;
+  /** Dark-mode override; if empty string, falls back to `primary`. */
+  darkPrimary: string;
+  /** Dark-mode override; if empty string, falls back to `secondary`. */
+  darkSecondary: string;
+  /** Active built-in preset, or 'system' for the framework defaults. */
+  preset: 'system' | PresetName;
   radius: number;
   font: string;
 }
+
+export const DEFAULT_CUSTOMIZER: CustomizerState = {
+  primary: '#3b6cff',
+  secondary: '#6b7280',
+  darkPrimary: '',
+  darkSecondary: '',
+  preset: 'system',
+  radius: 8,
+  font: 'Inter',
+};
 
 interface Props {
   state: CustomizerState;

@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "npm run dev --workspace apps/sample-web",
     "docs": "npm run dev --workspace apps/docs",
+    "storybook": "npm run storybook --workspace packages/ui",
+    "build-storybook": "npm run build-storybook --workspace packages/ui",
     "build": "npm run build --workspaces --if-present",
     "build:packages": "npm run build --workspace packages/ui",
     "test": "npm test --workspace packages/ui",

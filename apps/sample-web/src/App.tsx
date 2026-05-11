@@ -58,6 +58,9 @@ import {
   AccordionItem,
   DataGrid,
   type DataGridColumn,
+  Combobox,
+  MultiSelect,
+  DatePicker,
   useToast,
 } from '@yavuzmercan/ui/components';
 import {
@@ -66,7 +69,9 @@ import {
   useBreakpoint,
   useBreakpointDown,
   presets,
+  useForm,
   type PresetName,
+  type Resolver,
 } from '@yavuzmercan/ui';
 import {
   Sun,
@@ -845,6 +850,182 @@ const ResponsiveLayoutSection = () => {
   );
 };
 
+interface SignupValues {
+  fullName: string;
+  email: string;
+  country: string;
+  interests: string[];
+  birthDate: Date | null;
+  agree: boolean;
+}
+
+const COUNTRIES = [
+  { value: 'tr', label: 'Türkiye' },
+  { value: 'us', label: 'United States' },
+  { value: 'de', label: 'Germany' },
+  { value: 'fr', label: 'France' },
+  { value: 'jp', label: 'Japan' },
+  { value: 'br', label: 'Brazil' },
+];
+
+const INTERESTS = [
+  { value: 'react', label: 'React' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'design', label: 'Design systems' },
+  { value: 'a11y', label: 'Accessibility' },
+  { value: 'i18n', label: 'i18n' },
+  { value: 'testing', label: 'Testing' },
+];
+
+const signupResolver: Resolver<SignupValues> = (v) => {
+  const errors: Partial<Record<keyof SignupValues, string>> = {};
+  if (v.fullName.trim().length < 2) errors.fullName = 'At least 2 characters';
+  if (!/^\S+@\S+\.\S+$/.test(v.email)) errors.email = 'Invalid email';
+  if (!v.country) errors.country = 'Please pick a country';
+  if (v.interests.length === 0) errors.interests = 'Pick at least one';
+  if (!v.birthDate) errors.birthDate = 'Required';
+  else if (v.birthDate > new Date()) errors.birthDate = 'Cannot be in the future';
+  if (!v.agree) errors.agree = 'You must accept the terms';
+  return errors;
+};
+
+const ValidatedFormSection = () => {
+  const { t } = useTranslation();
+  const toast = useToast();
+  const form = useForm<SignupValues>({
+    defaultValues: {
+      fullName: '',
+      email: '',
+      country: '',
+      interests: [],
+      birthDate: null,
+      agree: false,
+    },
+    resolver: signupResolver,
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  });
+
+  const onSubmit = form.handleSubmit(async (values) => {
+    await new Promise((r) => setTimeout(r, 500));
+    toast.show({
+      title: 'Form submitted',
+      message: `${values.fullName} — ${values.interests.length} interests`,
+      status: 'success',
+    });
+    form.reset();
+  });
+
+  const fullName = form.getFieldState('fullName');
+  const email = form.getFieldState('email');
+  const country = form.getFieldState('country');
+  const interests = form.getFieldState('interests');
+  const birthDate = form.getFieldState('birthDate');
+  const agree = form.getFieldState('agree');
+
+  return (
+    <Section title={t('sections.validatedForm')}>
+      <VStack gap="md">
+        <Text tone="muted">
+          <code>useForm</code> hook ties values, errors, touched, and async submit together. Errors surface
+          on submit, then revalidate live as you type.
+        </Text>
+        <Card>
+          <CardBody>
+            <form onSubmit={onSubmit} noValidate>
+              <Grid columns={{ base: 1, md: 2 }} gap="md">
+                <FormField
+                  label="Full name"
+                  required
+                  errorText={fullName.touched ? fullName.error : undefined}
+                >
+                  <Input
+                    placeholder="Ada Lovelace"
+                    {...form.register('fullName')}
+                  />
+                </FormField>
+                <FormField
+                  label="Email"
+                  required
+                  errorText={email.touched ? email.error : undefined}
+                >
+                  <Input
+                    type="email"
+                    placeholder="ada@example.com"
+                    {...form.register('email')}
+                  />
+                </FormField>
+                <FormField
+                  label="Country"
+                  required
+                  errorText={country.touched ? country.error : undefined}
+                >
+                  <Combobox
+                    options={COUNTRIES}
+                    value={form.values.country}
+                    onChange={(v) => form.setValue('country', v)}
+                    placeholder="Search countries…"
+                    invalid={country.touched && !!country.error}
+                  />
+                </FormField>
+                <FormField
+                  label="Birth date"
+                  required
+                  errorText={birthDate.touched ? birthDate.error : undefined}
+                >
+                  <DatePicker
+                    value={form.values.birthDate}
+                    onChange={(d) => form.setValue('birthDate', d)}
+                    maxDate={new Date()}
+                    invalid={birthDate.touched && !!birthDate.error}
+                  />
+                </FormField>
+                <GridItem colSpan={{ base: 1, md: 2 }}>
+                  <FormField
+                    label="Interests"
+                    required
+                    errorText={interests.touched ? interests.error : undefined}
+                  >
+                    <MultiSelect
+                      options={INTERESTS}
+                      value={form.values.interests}
+                      onChange={(v) => form.setValue('interests', v)}
+                      placeholder="Pick a few…"
+                    />
+                  </FormField>
+                </GridItem>
+                <GridItem colSpan={{ base: 1, md: 2 }}>
+                  <Checkbox
+                    checked={form.values.agree}
+                    onChange={(e) => form.setValue('agree', e.target.checked)}
+                    label="I accept the terms and conditions"
+                  />
+                  {agree.touched && agree.error && (
+                    <Text tone="danger" size="sm">{agree.error}</Text>
+                  )}
+                </GridItem>
+              </Grid>
+              <HStack gap="sm" align="center" style={{ marginTop: 'var(--mf-spacing-lg)' }}>
+                <Text tone="muted" size="sm">
+                  isDirty: <code>{String(form.isDirty)}</code> · isValid: <code>{String(form.isValid)}</code>
+                  {' '}· submitCount: <code>{form.submitCount}</code>
+                </Text>
+                <Spacer />
+                <Button variant="ghost" type="button" onClick={() => form.reset()} disabled={!form.isDirty}>
+                  Reset
+                </Button>
+                <Button type="submit" loading={form.isSubmitting} leftIcon={<Check size={16} />}>
+                  Submit
+                </Button>
+              </HStack>
+            </form>
+          </CardBody>
+        </Card>
+      </VStack>
+    </Section>
+  );
+};
+
 export const App = () => {
   const [preset, setPreset] = useState<'system' | PresetName>('system');
 
@@ -874,6 +1055,7 @@ export const App = () => {
         </Box>
         <PresetsSection preset={preset} onPresetChange={setPreset} />
         <ResponsiveLayoutSection />
+        <ValidatedFormSection />
         <DataGridSection />
         <ButtonsSection />
         <TypographySection />

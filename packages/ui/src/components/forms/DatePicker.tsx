@@ -51,7 +51,15 @@ export const DatePicker = ({
         className="mf-input"
         value={display}
         onClick={() => !disabled && setOpen((v) => !v)}
-        onFocus={() => !disabled && setOpen(true)}
+        onKeyDown={(e) => {
+          if (disabled) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setOpen((v) => !v);
+          } else if (e.key === 'Escape') {
+            setOpen(false);
+          }
+        }}
         readOnly
         disabled={disabled}
         placeholder={placeholder}

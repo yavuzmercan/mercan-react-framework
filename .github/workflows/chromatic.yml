@@ -1,0 +1,50 @@
+name: Chromatic
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Aynı branch'ten ardı ardına push gelirse eski koşumu iptal et
+concurrency:
+  group: chromatic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic:
+    name: Visual regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Chromatic ihtiyaç duyduğu için tam git history
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Chromatic kendi build-storybook'unu içerden çağırır,
+      # ama -d ile zaten built bir Storybook verirsek daha hızlı olur.
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: packages/ui
+          storybookBuildDir: storybook-static
+          # Master gibi PR'ı baseline'a göre kontrol et;
+          # snapshot değişikliği build'i kırmasın (review'da elle approve).
+          exitZeroOnChanges: true
+          onlyChanged: true

@@ -8,5 +8,12 @@
     "emitDeclarationOnly": false
   },
   "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/components/test/**/*"]
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.stories.ts",
+    "src/**/*.stories.tsx",
+    "src/components/test/**/*",
+    "src/stories/**/*"
+  ]
 }

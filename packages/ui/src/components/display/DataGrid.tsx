@@ -1,4 +1,5 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { cx } from '../../core';
 import { ChevronUp, ChevronDown, ArrowUpDown } from '../../icons';
 import { Skeleton } from './Skeleton';
@@ -85,6 +86,16 @@ export interface DataGridProps<T> {
   emptyState?: ReactNode;
   emptyMessage?: string;
 
+  /**
+   * Virtualize row rendering — only paints rows in the viewport. Use for 1000+ rows.
+   * Requires `maxHeight` and works best with a fixed `rowHeight`. Disables pagination.
+   */
+  virtualize?: boolean;
+  /** Estimated row height in pixels (used by the virtualizer). Default 48. */
+  rowHeight?: number;
+  /** Rows rendered outside the visible area on each side. Default 8. */
+  overscan?: number;
+
   className?: string;
 }
 
@@ -127,6 +138,10 @@ export function DataGrid<T>({
 
   emptyState,
   emptyMessage = 'No data',
+
+  virtualize,
+  rowHeight = 48,
+  overscan = 8,
 
   className,
 }: DataGridProps<T>) {
@@ -191,12 +206,27 @@ export function DataGrid<T>({
     return [...data].sort((a, b) => compareValues(accessor(a), accessor(b)) * dir);
   }, [data, columns, sort, manualSort]);
 
-  // Apply pagination
+  // Apply pagination (virtualize bypasses pagination — they are mutually exclusive)
   const pagedData = useMemo(() => {
+    if (virtualize) return sortedData;
     if (manualPagination || !pagination) return sortedData;
     const start = (currentPage - 1) * pageSize;
     return sortedData.slice(start, start + pageSize);
-  }, [sortedData, currentPage, pageSize, pagination, manualPagination]);
+  }, [sortedData, currentPage, pageSize, pagination, manualPagination, virtualize]);
+
+  // Virtualizer — only active when `virtualize` is set
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: virtualize ? pagedData.length : 0,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => rowHeight,
+    overscan,
+  });
+  const virtualItems = virtualize ? virtualizer.getVirtualItems() : [];
+  const virtualTotalSize = virtualize ? virtualizer.getTotalSize() : 0;
+  const virtualPaddingTop = virtualItems.length > 0 ? virtualItems[0]!.start : 0;
+  const virtualPaddingBottom =
+    virtualItems.length > 0 ? virtualTotalSize - virtualItems[virtualItems.length - 1]!.end : 0;
 
   const total = manualPagination ? totalCount ?? data.length : sortedData.length;
   const pageCount = pagination ? Math.max(1, Math.ceil(total / pageSize)) : 1;
@@ -224,8 +254,15 @@ export function DataGrid<T>({
   return (
     <div className={cx('mf-datagrid', className)} data-density={density}>
       <div
+        ref={scrollRef}
         className="mf-datagrid-scroll"
-        style={maxHeight ? { maxHeight, overflow: 'auto' } : undefined}
+        style={
+          virtualize
+            ? { maxHeight: maxHeight ?? 480, overflow: 'auto' }
+            : maxHeight
+            ? { maxHeight, overflow: 'auto' }
+            : undefined
+        }
       >
         <table className="mf-datagrid-table" data-striped={striped ? 'true' : undefined} data-hover={hover ? 'true' : undefined}>
           <thead className={cx('mf-datagrid-head', stickyHeader && 'mf-datagrid-sticky')}>
@@ -272,29 +309,39 @@ export function DataGrid<T>({
             </tr>
           </thead>
           <tbody>
-            {loading
-              ? Array.from({ length: loadingRows }).map((_, i) => (
-                  <tr key={`__skeleton-${i}`} className="mf-datagrid-row">
-                    {selectable && (
-                      <td className="mf-datagrid-td mf-datagrid-select-cell">
-                        <Skeleton width={16} height={16} />
-                      </td>
-                    )}
-                    {columns.map((col) => (
-                      <td key={col.key} className="mf-datagrid-td" style={{ textAlign: col.align }}>
-                        <Skeleton width="80%" height={14} />
-                      </td>
-                    ))}
+            {loading &&
+              Array.from({ length: loadingRows }).map((_, i) => (
+                <tr key={`__skeleton-${i}`} className="mf-datagrid-row">
+                  {selectable && (
+                    <td className="mf-datagrid-td mf-datagrid-select-cell">
+                      <Skeleton width={16} height={16} />
+                    </td>
+                  )}
+                  {columns.map((col) => (
+                    <td key={col.key} className="mf-datagrid-td" style={{ textAlign: col.align }}>
+                      <Skeleton width="80%" height={14} />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+
+            {!loading && virtualize && (
+              <>
+                {virtualPaddingTop > 0 && (
+                  <tr aria-hidden="true" style={{ height: virtualPaddingTop }}>
+                    <td colSpan={columns.length + (selectable ? 1 : 0)} style={{ padding: 0, border: 0 }} />
                   </tr>
-                ))
-              : pagedData.map((row, i) => {
-                  const key = rowKey(row, i);
+                )}
+                {virtualItems.map((vi) => {
+                  const row = pagedData[vi.index]!;
+                  const key = rowKey(row, vi.index);
                   const isSelected = selectedSet.has(key);
                   return (
                     <tr
                       key={key}
                       className="mf-datagrid-row"
                       data-selected={isSelected ? 'true' : undefined}
+                      style={{ height: vi.size }}
                     >
                       {selectable && (
                         <td className="mf-datagrid-td mf-datagrid-select-cell">
@@ -320,12 +367,61 @@ export function DataGrid<T>({
                           className={cx('mf-datagrid-td', col.className)}
                           style={{ textAlign: col.align }}
                         >
-                          {col.cell ? col.cell(row, i) : String((row as Record<string, unknown>)[col.key] ?? '')}
+                          {col.cell ? col.cell(row, vi.index) : String((row as Record<string, unknown>)[col.key] ?? '')}
                         </td>
                       ))}
                     </tr>
                   );
                 })}
+                {virtualPaddingBottom > 0 && (
+                  <tr aria-hidden="true" style={{ height: virtualPaddingBottom }}>
+                    <td colSpan={columns.length + (selectable ? 1 : 0)} style={{ padding: 0, border: 0 }} />
+                  </tr>
+                )}
+              </>
+            )}
+
+            {!loading && !virtualize &&
+              pagedData.map((row, i) => {
+                const key = rowKey(row, i);
+                const isSelected = selectedSet.has(key);
+                return (
+                  <tr
+                    key={key}
+                    className="mf-datagrid-row"
+                    data-selected={isSelected ? 'true' : undefined}
+                  >
+                    {selectable && (
+                      <td className="mf-datagrid-td mf-datagrid-select-cell">
+                        {selectable === 'multiple' ? (
+                          <Checkbox
+                            aria-label="Select row"
+                            checked={isSelected}
+                            onChange={() => toggleRow(key)}
+                          />
+                        ) : (
+                          <input
+                            type="radio"
+                            aria-label="Select row"
+                            checked={isSelected}
+                            onChange={() => toggleRow(key)}
+                          />
+                        )}
+                      </td>
+                    )}
+                    {columns.map((col) => (
+                      <td
+                        key={col.key}
+                        className={cx('mf-datagrid-td', col.className)}
+                        style={{ textAlign: col.align }}
+                      >
+                        {col.cell ? col.cell(row, i) : String((row as Record<string, unknown>)[col.key] ?? '')}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+
             {showEmpty && (
               <tr className="mf-datagrid-row">
                 <td
@@ -340,7 +436,7 @@ export function DataGrid<T>({
         </table>
       </div>
 
-      {pagination && pageCount > 1 && (
+      {!virtualize && pagination && pageCount > 1 && (
         <div className="mf-datagrid-footer">
           <span className="mf-datagrid-info">
             {total === 0 ? '0' : `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, total)} of ${total}`}

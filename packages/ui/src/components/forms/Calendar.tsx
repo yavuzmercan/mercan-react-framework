@@ -75,19 +75,19 @@ export const Calendar = ({
   };
 
   return (
-    <div className={cx('mf-calendar', className)} role="grid">
+    <div className={cx('mf-calendar', className)} role="group" aria-label={`Calendar — ${monthLabel}`}>
       <div className="mf-calendar-header">
         <button type="button" className="mf-calendar-nav" onClick={goPrev} aria-label="Previous month">
           <ChevronLeft size={16} />
         </button>
-        <span className="mf-calendar-title">{monthLabel}</span>
+        <span className="mf-calendar-title" aria-live="polite">{monthLabel}</span>
         <button type="button" className="mf-calendar-nav" onClick={goNext} aria-label="Next month">
           <ChevronRight size={16} />
         </button>
       </div>
       <div className="mf-calendar-grid">
         {dows.map((d) => (
-          <div key={d} className="mf-calendar-dow">{d}</div>
+          <div key={d} className="mf-calendar-dow" aria-hidden="true">{d}</div>
         ))}
         {days.map((d, i) => {
           const outside = d.getMonth() !== view.getMonth();

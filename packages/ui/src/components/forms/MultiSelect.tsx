@@ -15,7 +15,13 @@ export interface MultiSelectProps {
   onChange?: (value: string[]) => void;
   placeholder?: string;
   disabled?: boolean;
+  invalid?: boolean;
   className?: string;
+  id?: string;
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
+  'aria-describedby'?: string;
+  'aria-invalid'?: boolean | 'true' | 'false';
 }
 
 export const MultiSelect = ({
@@ -25,7 +31,13 @@ export const MultiSelect = ({
   onChange,
   placeholder = 'Select…',
   disabled,
+  invalid,
   className,
+  id,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
+  'aria-invalid': ariaInvalid,
 }: MultiSelectProps) => {
   const [internal, setInternal] = useState<string[]>(defaultValue);
   const value = controlled ?? internal;
@@ -80,6 +92,7 @@ export const MultiSelect = ({
         ))}
         <input
           ref={inputRef}
+          id={id}
           className="mf-multiselect-input"
           value={query}
           onChange={(e) => {
@@ -88,6 +101,14 @@ export const MultiSelect = ({
           }}
           onKeyDown={handleKey}
           disabled={disabled}
+          aria-label={ariaLabel ?? (ariaLabelledBy ? undefined : placeholder)}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+          aria-invalid={ariaInvalid ?? invalid}
+          aria-expanded={open}
+          aria-haspopup="listbox"
+          role="combobox"
+          autoComplete="off"
         />
       </div>
       {open && (

@@ -4,3 +4,4 @@ export * from './lifecycle';
 export * from './async';
 export * from './dom';
 export * from './browser';
+export * from './form';

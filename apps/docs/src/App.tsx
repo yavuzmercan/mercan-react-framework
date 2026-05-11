@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { MercanProvider, BackToTop, useBreakpointDown } from '@yavuzmercan/ui';
+import { MercanProvider, BackToTop, useBreakpointDown, useLocalStorage } from '@yavuzmercan/ui';
 import { MenuIcon, X } from '@yavuzmercan/ui/icons';
 import { HashRouter, useRouter } from './router';
 import { ROUTES } from './routes';
 import { PAGES } from './pages';
-import { ThemeCustomizer, type CustomizerState } from './ThemeCustomizer';
+import { ThemeBuilderPage } from './pages/ThemeBuilder';
+import { ThemeCustomizer, type CustomizerState, DEFAULT_CUSTOMIZER } from './ThemeCustomizer';
 
 const resources = {
   en: {
@@ -47,8 +48,23 @@ const Sidebar = ({ mobileOpen, onClose }: SidebarProps) => {
   );
 };
 
-const Page = () => {
+const Page = ({
+  state,
+  onChange,
+}: {
+  state: CustomizerState;
+  onChange: (s: CustomizerState) => void;
+}) => {
   const { path } = useRouter();
+  if (path === '/builder') {
+    return (
+      <main className="docs-main">
+        <div className="docs-main-inner">
+          <ThemeBuilderPage state={state} onChange={onChange} />
+        </div>
+      </main>
+    );
+  }
   const Component = PAGES[path] ?? PAGES['/']!;
   return (
     <main className="docs-main">
@@ -79,12 +95,10 @@ const Shell = ({ state, setState }: { state: CustomizerState; setState: (s: Cust
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { path } = useRouter();
 
-  // Auto-close drawer when route changes (mobile)
   useEffect(() => {
     if (isMobile) setMobileSidebarOpen(false);
   }, [path, isMobile]);
 
-  // Close drawer on resize back to desktop
   useEffect(() => {
     if (!isMobile) setMobileSidebarOpen(false);
   }, [isMobile]);
@@ -109,18 +123,21 @@ const Shell = ({ state, setState }: { state: CustomizerState; setState: (s: Cust
         data-mobile-open={mobileSidebarOpen ? 'true' : undefined}
         onClick={() => setMobileSidebarOpen(false)}
       />
-      <Page />
+      <Page state={state} onChange={setState} />
     </div>
   );
 };
 
 export const App = () => {
-  const [customizer, setCustomizer] = useState<CustomizerState>({
-    primary: '#3b6cff',
-    secondary: '#6b7280',
-    radius: 8,
-    font: 'Inter',
-  });
+  const [customizer, setCustomizer] = useLocalStorage<CustomizerState>(
+    'mf-docs-customizer',
+    DEFAULT_CUSTOMIZER,
+    {
+      // Forward-compatible: merge persisted shape onto defaults so old keys
+      // missing the new fields (darkPrimary/darkSecondary/preset) still work.
+      deserialize: (raw) => ({ ...DEFAULT_CUSTOMIZER, ...(JSON.parse(raw) as Partial<CustomizerState>) }),
+    },
+  );
 
   const radiiOverride = {
     sm: `${Math.max(2, customizer.radius - 4)}px`,
@@ -130,6 +147,12 @@ export const App = () => {
   };
 
   const isSystem = customizer.font === 'System';
+  const darkBrand = customizer.darkPrimary || customizer.darkSecondary
+    ? {
+        primary: customizer.darkPrimary || customizer.primary,
+        secondary: customizer.darkSecondary || customizer.secondary,
+      }
+    : undefined;
 
   return (
     <MercanProvider
@@ -137,7 +160,9 @@ export const App = () => {
       locale="en"
       fallbackLocale="en"
       resources={resources}
+      preset={customizer.preset === 'system' ? undefined : customizer.preset}
       brand={{ primary: customizer.primary, secondary: customizer.secondary }}
+      darkBrand={darkBrand}
       googleFonts={isSystem ? undefined : { body: customizer.font, heading: customizer.font }}
       lightOverride={{ radii: radiiOverride }}
       darkOverride={{ radii: radiiOverride }}

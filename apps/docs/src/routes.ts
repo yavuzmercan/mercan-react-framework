@@ -15,6 +15,7 @@ export const ROUTES: RouteSection[] = [
       { path: '/', label: 'Introduction' },
       { path: '/install', label: 'Installation' },
       { path: '/theming', label: 'Theming' },
+      { path: '/builder', label: 'Theme builder' },
       { path: '/presets', label: 'Theme presets' },
       { path: '/i18n', label: 'i18n' },
       { path: '/icons', label: 'Icons' },

@@ -79,9 +79,11 @@ npm run dev --workspace packages/ui   # tsup --watch
 | --- | --- |
 | `npm run dev` | Start the sample-web Vite app |
 | `npm run docs` | Start the docs Vite app |
+| `npm run storybook` | Open Storybook at http://localhost:6006 (component playground + a11y) |
+| `npm run build-storybook` | Static Storybook into `packages/ui/storybook-static/` |
 | `npm run build:packages` | Build `@yavuzmercan/ui` (ESM + CJS + d.ts + CSS) |
 | `npm run build` | Build everything (packages + apps) |
-| `npm test` | Run vitest test suite (47 tests) |
+| `npm test` | Run vitest test suite (124 tests) |
 | `npm run typecheck` | TypeScript project-references build |
 | `npm run changeset` | Create a new changeset entry |
 | `npm run version` | Apply pending changesets — bumps version, updates CHANGELOG |
@@ -91,10 +93,22 @@ npm run dev --workspace packages/ui   # tsup --watch
 
 - **Build:** [tsup](https://tsup.egoist.dev/) (ESM + CJS + .d.ts)
 - **Test:** [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/) + jsdom
+- **Stories:** [Storybook 8](https://storybook.js.org/) (Vite framework, a11y addon, theme switcher)
+- **Visual regression:** [Chromatic](https://www.chromatic.com/) — runs on every PR
 - **Apps:** [Vite](https://vitejs.dev/) + React 18
 - **Versioning:** [Changesets](https://github.com/changesets/changesets)
 - **CI:** GitHub Actions (test + auto-release)
 - **Bot updates:** Dependabot (weekly, grouped)
+
+## Storybook + Chromatic
+
+Storybook lives in `packages/ui/.storybook/` with stories under `packages/ui/src/stories/`. Every story is auto-wrapped in `MercanProvider` (preview.tsx) so theme tokens, i18n, and toasts are available without per-story setup. Use the toolbar's theme switcher to flip between light/dark.
+
+To enable Chromatic visual regression on PRs:
+
+1. Sign up at [chromatic.com](https://www.chromatic.com/) and link this repo.
+2. Add the `CHROMATIC_PROJECT_TOKEN` secret in GitHub repo settings.
+3. The [`chromatic.yml`](./.github/workflows/chromatic.yml) workflow then runs on every push/PR — snapshots changed stories, comments on the PR, and fails only when you tell it to fail (currently `exitZeroOnChanges: true`).
 
 ## Contributing
 

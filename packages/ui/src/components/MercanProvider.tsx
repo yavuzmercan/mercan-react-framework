@@ -29,6 +29,8 @@ export interface GoogleFontsConfig {
   fallback?: { body?: string; heading?: string; mono?: string };
 }
 
+export type Direction = 'ltr' | 'rtl';
+
 export interface MercanProviderProps {
   children: ReactNode;
   defaultColorMode?: ColorMode;
@@ -48,6 +50,8 @@ export interface MercanProviderProps {
   persistColorMode?: boolean;
   /** localStorage key for persisted color mode. Default `'mf-color-mode'`. */
   colorModeStorageKey?: string;
+  /** Text direction. Sets `dir` on `<html>` and `data-mf-dir` on the root div. Default `'ltr'`. */
+  direction?: Direction;
   locale: Locale;
   resources: I18nResources;
   fallbackLocale?: Locale;
@@ -117,11 +121,24 @@ export const MercanProvider = ({
   preset,
   persistColorMode = true,
   colorModeStorageKey,
+  direction = 'ltr',
   locale,
   resources,
   fallbackLocale,
   toastPosition,
 }: MercanProviderProps) => {
+  // Sync `dir` attribute on <html> so logical properties + form controls
+  // (date pickers, selects, etc.) render correctly under RTL.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const prev = document.documentElement.getAttribute('dir');
+    document.documentElement.setAttribute('dir', direction);
+    return () => {
+      if (prev === null) document.documentElement.removeAttribute('dir');
+      else document.documentElement.setAttribute('dir', prev);
+    };
+  }, [direction]);
+
   // Load Google Fonts (idempotent)
   useEffect(() => {
     if (!googleFonts) return;
@@ -157,7 +174,7 @@ export const MercanProvider = ({
     >
       <I18nProvider resources={resources} defaultLocale={locale} fallbackLocale={fallbackLocale}>
         <ToastProvider position={toastPosition}>
-          <div className="mf-root">{children}</div>
+          <div className="mf-root" data-mf-dir={direction}>{children}</div>
         </ToastProvider>
       </I18nProvider>
     </ThemeProvider>

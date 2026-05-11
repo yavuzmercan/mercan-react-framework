@@ -8,8 +8,9 @@ export interface ProgressProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
-  ({ value = 0, max = 100, indeterminate, className, ...rest }, ref) => {
+  ({ value = 0, max = 100, indeterminate, className, 'aria-label': ariaLabel, ...rest }, ref) => {
     const pct = Math.min(100, Math.max(0, (value / max) * 100));
+    const labelledBy = (rest as { 'aria-labelledby'?: string })['aria-labelledby'];
     return (
       <div
         ref={ref}
@@ -18,6 +19,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         aria-valuemin={0}
         aria-valuemax={max}
         aria-valuenow={indeterminate ? undefined : value}
+        aria-label={ariaLabel ?? (labelledBy ? undefined : 'Progress')}
         data-indeterminate={indeterminate ? 'true' : undefined}
         {...rest}
       >
